@@ -16,8 +16,11 @@
 ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
+#if defined(_RTE_)
+#   include "RTE_Components.h"
+#endif
 #include "perf_counter.h"
-#include "RTE_Components.h"
 #include "led_port.h"
 #include "serial.h"
 #include "Board_GLCD.h"

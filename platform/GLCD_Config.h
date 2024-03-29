@@ -85,4 +85,6 @@
 #define GLCD_COLOR_YELLOW       __RGB( 255, 255, 0    )
 #define GLCD_COLOR_WHITE        __RGB( 255, 255, 255  )
 
+
+
 #endif /* __GLCD_CONFIG_H */
