@@ -64,3 +64,6 @@ RTE_Components.h
 Pre_Include_Global.h
 *.00??
 
+*.__i
+*.tmp
+*._ac
