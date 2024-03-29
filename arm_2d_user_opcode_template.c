@@ -150,26 +150,27 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
     unsigned char *pt8;
     uint32_t *pt32;
 
+    pt32 = data;
+
     /* rows direct path */
-    for (iY = 0; iY < iHeight; iY++)
-    {   
-      
-        pt32 = &(data[iY*iTargetStride]);
-       
+    for (iY = 0; iY < iHeight; iY++) {   
+
         pt8 = (unsigned char *)pt32;     /* read RGBA 8888  */
         accuR = *pt8++;
         accuG = *pt8++;
         accuB = *pt8++;
-        pt8++;                  /* skip A */
-        pt8 = pt8-4;            
-    
+        //pt8++;                  /* skip A */
+        pt8 = (unsigned char *)pt32;
+
         for (iX = 0; iX < iWidth; iX++)
-        {   
+        {
             accuR += ((*pt8) - accuR) >> c;  *pt8++ = accuR;
             accuG += ((*pt8) - accuG) >> c;  *pt8++ = accuG;
             accuB += ((*pt8) - accuB) >> c;  *pt8++ = accuB;
             pt8++;                  /* skip A */
         }
+        
+        pt32 +=iTargetStride;
           
     }
 
@@ -197,27 +198,26 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
 #endif 
 
 #if 1
+
+    pt32 = data;
+
     /* columns direct path */
     for (iX = 0; iX < iWidth; iX++)
-    {   
-        pt32 = &(data[iX]);      
-
-        pt8 = (char *)pt32;     /* read RGBA 8888  */
+    {     
+        pt8 = (uint8_t *)pt32;     /* read RGBA 8888  */
         accuR = *pt8++;
         accuG = *pt8++;
         accuB = *pt8++;
-        pt8++;                  /* skip A */
-        pt8 = pt8-4;   
 
-        for (iY = 0; iY < iHeight; iY++)
-        {   
+        pt8 = (uint8_t *)pt32++;
+        
+        for (iY = 0; iY < iHeight; iY++) {
             accuR += ((*pt8) - accuR) >> c;  *pt8++ = accuR;
             accuG += ((*pt8) - accuG) >> c;  *pt8++ = accuG;
             accuB += ((*pt8) - accuB) >> c;  *pt8++ = accuB;
-            pt8++; 
-            pt8 = pt8 - 4 + (iTargetStride*4);
+
+            pt8 += (iTargetStride*4) - 3;
         }
-          
     }
 #endif
 #if 0
