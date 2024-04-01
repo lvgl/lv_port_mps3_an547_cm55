@@ -133,7 +133,7 @@
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>0</UpdateFlashBeforeDebugging>
-            <Capability>0</Capability>
+            <Capability>1</Capability>
             <DriverSelection>4101</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
@@ -463,6 +463,11 @@
               <FileName>arm_2d_user_opcode_template.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\arm_2d_user_opcode_template.c</FilePath>
+            </File>
+            <File>
+              <FileName>SIMD_BLUR.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\SIMD_BLUR.s</FilePath>
             </File>
           </Files>
         </Group>

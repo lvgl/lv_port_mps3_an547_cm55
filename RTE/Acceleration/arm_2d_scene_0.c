@@ -155,7 +155,7 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
     this.chBlurDegree--;
-    if (this.chBlurDegree < 32) {
+    if (this.chBlurDegree < 16) {
         this.chBlurDegree = 128;
     }
 }
