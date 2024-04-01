@@ -148,7 +148,7 @@ arm_fsm_rt_t __arm_2d_cccn888_sw_user_opcode_template( __arm_2d_sub_task_t *ptTa
 #define BLUR_ASM 0
 void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStride, char cBlur)           
 {
-    short iY, iX, ibyte, ibit;
+    short iY, iX, ibyte, ibit, ratio = 1 + cBlur;
     unsigned short accuR, accuG, accuB;
     unsigned char *pt8, s1, s2, s3;
     uint32_t *pt32, shifts, mask;
@@ -157,24 +157,25 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
 extern void blur_filter_asm(uint32_t *pt32, const uint32_t iWidth, const int32_t inc, const uint32_t shifts);  
 #endif    
     
-    shifts = 0x09090909;
-    for (ibyte = 0, ibit = 7; ibit > 0; ibit--)
-    {   if (cBlur & (1<<ibit)) 
-        {   mask = 0xFF << (8*ibyte);
-            shifts = shifts & (~mask); // clear 
-            shifts = shifts | ((8-ibit) << (8*ibyte)); 
-            ibyte++;
-        }
-        if (ibyte > 2) break;
-    }
-    s1 = shifts & 0xFF;
-    s2 = (shifts>>8) & 0xFF;
-    s3 = (shifts>>16) & 0xFF;    
+//    shifts = 0x09090909;
+//    for (ibyte = 0, ibit = 7; ibit > 0; ibit--)
+//    {   if (cBlur & (1<<ibit)) 
+//        {   mask = 0xFF << (8*ibyte);
+//            shifts = shifts & (~mask); // clear 
+//            shifts = shifts | ((8-ibit) << (8*ibyte)); 
+//            ibyte++;
+//        }
+//        if (ibyte > 2) break;
+//    }
+//    s1 = shifts & 0xFF;
+//    s2 = (shifts>>8) & 0xFF;
+//    s3 = (shifts>>16) & 0xFF;    
     
     pt32 = data;
 
     /* rows direct path */
     for (iY = 0; iY < iHeight; iY++) {   
+
 
 #if BLUR_ASM
         blur_filter_asm(pt32, iWidth, 1, shifts);            
@@ -188,12 +189,24 @@ extern void blur_filter_asm(uint32_t *pt32, const uint32_t iWidth, const int32_t
 
         for (iX = 0; iX < iWidth; iX++)
         {
+        #if 0
             accuR += (((*pt8)-accuR)>>s1) + (((*pt8)-accuR)>>s2) + (((*pt8)-accuR)>>s3); *pt8++ = accuR;
             accuG += (((*pt8)-accuG)>>s1) + (((*pt8)-accuG)>>s2) + (((*pt8)-accuG)>>s3); *pt8++ = accuG;
             accuB += (((*pt8)-accuB)>>s1) + (((*pt8)-accuB)>>s2) + (((*pt8)-accuB)>>s3); *pt8++ = accuB;
+        #else
+//            accuR += ((*pt8) - accuR) >> c;  *pt8++ = accuR;
+//            accuG += ((*pt8) - accuG) >> c;  *pt8++ = accuG;
+//            accuB += ((*pt8) - accuB) >> c;  *pt8++ = accuB;
+
+            accuR += ((*pt8) - accuR) * ratio >> 8;  *pt8++ = accuR;
+            accuG += ((*pt8) - accuG) * ratio >> 8;  *pt8++ = accuG;
+            accuB += ((*pt8) - accuB) * ratio >> 8;  *pt8++ = accuB;
+
+        #endif
             pt8++;                  /* skip A */
         }
-#endif        
+#endif
+
         pt32 +=iTargetStride;
           
     }
@@ -239,10 +252,15 @@ extern void blur_filter_asm(uint32_t *pt32, const uint32_t iWidth, const int32_t
         pt8 = (uint8_t *)pt32++;
         
         for (iY = 0; iY < iHeight; iY++) {
+        #if 0
             accuR += (((*pt8)-accuR)>>s1) + (((*pt8)-accuR)>>s2) + (((*pt8)-accuR)>>s3); *pt8++ = accuR;
             accuG += (((*pt8)-accuG)>>s1) + (((*pt8)-accuG)>>s2) + (((*pt8)-accuG)>>s3); *pt8++ = accuG;
             accuB += (((*pt8)-accuB)>>s1) + (((*pt8)-accuB)>>s2) + (((*pt8)-accuB)>>s3); *pt8++ = accuB;
-
+        #else
+            accuR += ((*pt8) - accuR) * ratio >> 8;  *pt8++ = accuR;
+            accuG += ((*pt8) - accuG) * ratio >> 8;  *pt8++ = accuG;
+            accuB += ((*pt8) - accuB) * ratio >> 8;  *pt8++ = accuB;
+        #endif
             pt8 += (iTargetStride*4) - 3;
         }
 #endif        
@@ -320,7 +338,7 @@ void __arm_2d_impl_cccn888_user_opcode_template(
         pwSource += iSourceStride;
         pwTarget += iTargetStride;
     }
-#endif    
+#endif
 }
 
 /*
