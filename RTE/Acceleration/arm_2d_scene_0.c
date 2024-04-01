@@ -154,7 +154,10 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-
+    this.chBlurDegree--;
+    if (this.chBlurDegree < 32) {
+        this.chBlurDegree = 128;
+    }
 }
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
@@ -313,7 +316,12 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
 
                         arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
-                        arm_lcd_print_banner("Algorithm 3", __item_region);
+                        //arm_lcd_print_banner("Blur Degree %d", __item_region);
+                        do {
+                            arm_lcd_text_set_draw_region(&__item_region);
+                            arm_lcd_printf("Blur Degree: %d", (int)this.chBlurDegree);
+                            
+                        } while(0);
                     }
 
                     __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
@@ -324,7 +332,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
                         arm_2d_user_opcode_template_api_params_t tParams = {
                             .chChannel = 2,
-                            .sigma = 4,
+                            .sigma = 32,//this.chBlurDegree,
                         };
 
                         arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
@@ -429,6 +437,8 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
     };
     
     ARM_2D_OP_INIT(this.tUserOPCODETemplate);
+
+    this.chBlurDegree = 128;
 
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 
                                         &this.use_as__arm_2d_scene_t, 

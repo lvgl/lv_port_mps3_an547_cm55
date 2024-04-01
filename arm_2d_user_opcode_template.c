@@ -84,6 +84,8 @@ void __arm_2d_impl_cccn888_user_opcode_template(
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static uint8_t sigmadbg;
+
 /*
  * the Frontend API
  */
@@ -142,19 +144,41 @@ arm_fsm_rt_t __arm_2d_cccn888_sw_user_opcode_template( __arm_2d_sub_task_t *ptTa
 
 #define PFB_BLUR 0
 
-               
-void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStride, char c)           
+      
+#define BLUR_ASM 0
+void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStride, char cBlur)           
 {
-    short iY, iX, k;
+    short iY, iX, ibyte, ibit;
     unsigned short accuR, accuG, accuB;
-    unsigned char *pt8;
-    uint32_t *pt32;
+    unsigned char *pt8, s1, s2, s3;
+    uint32_t *pt32, shifts, mask;
 
+#if BLUR_ASM
+extern void blur_filter_asm(uint32_t *pt32, const uint32_t iWidth, const int32_t inc, const uint32_t shifts);  
+#endif    
+    
+    shifts = 0x09090909;
+    for (ibyte = 0, ibit = 7; ibit > 0; ibit--)
+    {   if (cBlur & (1<<ibit)) 
+        {   mask = 0xFF << (8*ibyte);
+            shifts = shifts & (~mask); // clear 
+            shifts = shifts | ((8-ibit) << (8*ibyte)); 
+            ibyte++;
+        }
+        if (ibyte > 2) break;
+    }
+    s1 = shifts & 0xFF;
+    s2 = (shifts>>8) & 0xFF;
+    s3 = (shifts>>16) & 0xFF;    
+    
     pt32 = data;
 
     /* rows direct path */
     for (iY = 0; iY < iHeight; iY++) {   
 
+#if BLUR_ASM
+        blur_filter_asm(pt32, iWidth, 1, shifts);            
+#else        
         pt8 = (unsigned char *)pt32;     /* read RGBA 8888  */
         accuR = *pt8++;
         accuG = *pt8++;
@@ -164,12 +188,12 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
 
         for (iX = 0; iX < iWidth; iX++)
         {
-            accuR += ((*pt8) - accuR) >> c;  *pt8++ = accuR;
-            accuG += ((*pt8) - accuG) >> c;  *pt8++ = accuG;
-            accuB += ((*pt8) - accuB) >> c;  *pt8++ = accuB;
+            accuR += (((*pt8)-accuR)>>s1) + (((*pt8)-accuR)>>s2) + (((*pt8)-accuR)>>s3); *pt8++ = accuR;
+            accuG += (((*pt8)-accuG)>>s1) + (((*pt8)-accuG)>>s2) + (((*pt8)-accuG)>>s3); *pt8++ = accuG;
+            accuB += (((*pt8)-accuB)>>s1) + (((*pt8)-accuB)>>s2) + (((*pt8)-accuB)>>s3); *pt8++ = accuB;
             pt8++;                  /* skip A */
         }
-        
+#endif        
         pt32 +=iTargetStride;
           
     }
@@ -204,6 +228,9 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
     /* columns direct path */
     for (iX = 0; iX < iWidth; iX++)
     {     
+#if BLUR_ASM
+        blur_filter_asm(pt32, iWidth, iTargetStride, shifts);            
+#else          
         pt8 = (uint8_t *)pt32;     /* read RGBA 8888  */
         accuR = *pt8++;
         accuG = *pt8++;
@@ -212,14 +239,17 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
         pt8 = (uint8_t *)pt32++;
         
         for (iY = 0; iY < iHeight; iY++) {
-            accuR += ((*pt8) - accuR) >> c;  *pt8++ = accuR;
-            accuG += ((*pt8) - accuG) >> c;  *pt8++ = accuG;
-            accuB += ((*pt8) - accuB) >> c;  *pt8++ = accuB;
+            accuR += (((*pt8)-accuR)>>s1) + (((*pt8)-accuR)>>s2) + (((*pt8)-accuR)>>s3); *pt8++ = accuR;
+            accuG += (((*pt8)-accuG)>>s1) + (((*pt8)-accuG)>>s2) + (((*pt8)-accuG)>>s3); *pt8++ = accuG;
+            accuB += (((*pt8)-accuB)>>s1) + (((*pt8)-accuB)>>s2) + (((*pt8)-accuB)>>s3); *pt8++ = accuB;
 
             pt8 += (iTargetStride*4) - 3;
         }
+#endif        
     }
 #endif
+
+
 #if 0
     /* columns reverse path */
     for (iX = iWidth-1; iX > 0; iX--)
@@ -260,6 +290,12 @@ void __arm_2d_impl_cccn888_user_opcode_template(
     uint_fast8_t chTargetChannel = ptParam->chChannel;
     uint_fast8_t sigma = ptParam->sigma;
 
+    
+    
+//    if (sigmadbg < 0x40)sigmadbg = sigmadbg + 0x01;
+//    else sigmadbg = sigmadbg + 0x04;
+//    
+//    if ((sigmadbg >= 0xC0) || (sigmadbg <= 0x01)) sigmadbg = 0x02;
   
     blur_filter (pwTarget, iWidth, iHeight, iTargetStride, sigma);
 
