@@ -146,125 +146,6 @@ arm_fsm_rt_t __arm_2d_cccn888_sw_user_opcode_template( __arm_2d_sub_task_t *ptTa
 }
 
 
-void blur_filter (uint32_t * data, int16_t iWidth, int16_t iHeight, int16_t iTargetStride, uint8_t cBlurDegree)           
-{
-    int16_t iY, iX, ibyte, ibit, ratio = 1 + cBlurDegree;
-    uint16_t accuR, accuG, accuB;
-    uint8_t *pchChannel = NULL;
-    
-    uint32_t *pwPixel = data;
-
-    /* rows direct path */
-    for (iY = 0; iY < iHeight; iY++) {   
-
-#if BLUR_ASM
-        blur_filter_asm(pwPixel, iWidth, 1, ratio);            
-#else        
-        pchChannel = (unsigned char *)pwPixel;     /* read RGBA 8888  */
-        accuR = *pchChannel++;
-        accuG = *pchChannel++;
-        accuB = *pchChannel++;
-
-        pchChannel = (unsigned char *)pwPixel;
-
-        for (iX = 0; iX < iWidth; iX++) {
-
-            accuR += ((*pchChannel) - accuR) * ratio >> 8;  *pchChannel++ = accuR;
-            accuG += ((*pchChannel) - accuG) * ratio >> 8;  *pchChannel++ = accuG;
-            accuB += ((*pchChannel) - accuB) * ratio >> 8;  *pchChannel++ = accuB;
-
-            pchChannel++;                  /* skip A */
-        }
-#endif
-
-        pwPixel +=iTargetStride;
-          
-    }
-
-#if defined(__ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__)                    \
- && __ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__
-    /* rows reverse path */
-    
-    pwPixel = &(data[(iWidth-1) + (iHeight-1)*iTargetStride]);
-    
-    for (iY = iHeight-1; iY > 0; iY--) {   
-        
-        pchChannel = (uint8_t *)pwPixel;     /* read RGBA 8888  */
-        accuR = *pchChannel++;
-        accuG = *pchChannel++;
-        accuB = *pchChannel++;
-
-        pchChannel = (uint8_t *)pwPixel;
-
-        for (iX = 0; iX < iWidth; iX++)
-        {   
-            accuR += ((*pchChannel) - accuR) * ratio >> 8;  *pchChannel++ = accuR;
-            accuG += ((*pchChannel) - accuG) * ratio >> 8;  *pchChannel++ = accuG;
-            accuB += ((*pchChannel) - accuB) * ratio >> 8;  *pchChannel++ = accuB;
-
-            pchChannel -= 7;
-        }
-        
-        pwPixel -=iTargetStride;
-    }
-#endif 
-
-#if 1
-
-    pwPixel = data;
-
-    /* columns direct path */
-    for (iX = 0; iX < iWidth; iX++) {     
-#if BLUR_ASM
-        blur_filter_asm(pwPixel, iWidth, iTargetStride, ratio);            
-#else          
-        pchChannel = (uint8_t *)pwPixel;     /* read RGBA 8888  */
-        accuR = *pchChannel++;
-        accuG = *pchChannel++;
-        accuB = *pchChannel++;
-
-        pchChannel = (uint8_t *)pwPixel++;
-        
-        for (iY = 0; iY < iHeight; iY++) {
-
-            accuR += ((*pchChannel) - accuR) * ratio >> 8;  *pchChannel++ = accuR;
-            accuG += ((*pchChannel) - accuG) * ratio >> 8;  *pchChannel++ = accuG;
-            accuB += ((*pchChannel) - accuB) * ratio >> 8;  *pchChannel++ = accuB;
-
-            pchChannel += (iTargetStride*4) - 3;
-        }
-#endif        
-    }
-#endif
-
-
-#if defined(__ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__)                    \
- && __ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__
-
-    pwPixel = &(data[iWidth-1 + (iHeight-1)*iTargetStride]);
-
-    /* columns reverse path */
-    for (iX = iWidth-1; iX > 0; iX--)
-    {   
-        pchChannel = (uint8_t *)pwPixel;     /* read RGBA 8888  */
-        accuR = *pchChannel++;
-        accuG = *pchChannel++;
-        accuB = *pchChannel++;
-
-        pchChannel = (uint8_t *)pwPixel--;
-
-        for (iY = 0; iY < iHeight; iY++)
-        {   
-            accuR += ((*pchChannel) - accuR) * ratio >> 8;  *pchChannel++ = accuR;
-            accuG += ((*pchChannel) - accuG) * ratio >> 8;  *pchChannel++ = accuG;
-            accuB += ((*pchChannel) - accuB) * ratio >> 8;  *pchChannel++ = accuB;
-
-            pchChannel -= 3 + (iTargetStride*4);
-        }
-    }
-#endif    
-}
-
 /* default low level implementation */
 __WEAK
 void __arm_2d_impl_cccn888_user_opcode_template(
@@ -277,7 +158,7 @@ void __arm_2d_impl_cccn888_user_opcode_template(
     int_fast16_t iHeight = ptCopySize->iHeight;
   
     //blur_filter (pwTarget, iWidth, iHeight, iTargetStride, sigma);
-    int16_t iY, iX, ibyte, ibit, ratio = 1 + ptParam->chBlurDegree;
+    int16_t iY, iX, ibyte, ibit, ratio = 256 - ptParam->chBlurDegree;
     uint16_t accuR, accuG, accuB;
     uint8_t *pchChannel = NULL;
     
