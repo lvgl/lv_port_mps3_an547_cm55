@@ -50,7 +50,7 @@ typedef struct arm_2d_user_opcode_template_api_params_t {
 
 
 typedef struct arm_2d_user_opcode_template_descriptor_t {
-    implement(arm_2d_op_cp_t);      /* inherit from base class arm_2d_op_cp_t*/
+    implement(arm_2d_op_t);                         /* inherit from base class arm_2d_op_cp_t*/
 
     arm_2d_user_opcode_template_api_params_t tParams;
 
@@ -67,10 +67,9 @@ const __arm_2d_op_info_t ARM_2D_OP_USER_OPCODE_TEMPLATE;
 /*============================ IMPLEMENTATION ================================*/
 
 extern
-ARM_NONNULL(2,3,5)
+ARM_NONNULL(2,4)
 arm_fsm_rt_t arm_2dp_cccn888_user_opcode_template(  
                     arm_2d_user_opcode_template_descriptor_t *ptOP,
-                    const arm_2d_tile_t *ptSource,
                     const arm_2d_tile_t *ptTarget,
                     const arm_2d_region_t *ptRegion,
                     const arm_2d_user_opcode_template_api_params_t *ptParams);

@@ -56,9 +56,9 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 #undef OP_CORE
-#define OP_CORE this.use_as__arm_2d_op_cp_t.use_as__arm_2d_op_core_t
+#define OP_CORE this.use_as__arm_2d_op_t.use_as__arm_2d_op_core_t
 
-#define OPCODE this.use_as__arm_2d_op_cp_t
+#define OPCODE this.use_as__arm_2d_op_t
 
 #ifndef __ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__
 #   define __ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__ 0
@@ -80,8 +80,6 @@ enum {
 /*============================ PROTOTYPES ====================================*/
 extern
 void __arm_2d_impl_cccn888_user_opcode_template(
-                            uint32_t *__RESTRICT pSource,
-                            int16_t iSourceStride,
                             uint32_t *__RESTRICT pTarget,
                             int16_t iTargetStride,
                             arm_2d_size_t *__RESTRICT ptCopySize,
@@ -103,16 +101,13 @@ static uint8_t sigmadbg;
  * the Frontend API
  */
 
-ARM_NONNULL(2,3,5)
+ARM_NONNULL(2,4)
 arm_fsm_rt_t arm_2dp_cccn888_user_opcode_template(  
                             arm_2d_user_opcode_template_descriptor_t *ptOP,
-                            const arm_2d_tile_t *ptSource,
                             const arm_2d_tile_t *ptTarget,
                             const arm_2d_region_t *ptRegion,
                             const arm_2d_user_opcode_template_api_params_t *ptParams)
 {
-
-    assert(NULL != ptSource);
     assert(NULL != ptTarget);
 
     ARM_2D_IMPL(arm_2d_user_opcode_template_descriptor_t, ptOP);
@@ -125,8 +120,6 @@ arm_fsm_rt_t arm_2dp_cccn888_user_opcode_template(
     
     OPCODE.Target.ptTile = ptTarget;
     OPCODE.Target.ptRegion = ptRegion;
-    OPCODE.Source.ptTile = ptSource;
-    OPCODE.wMode = 0;
 
     this.tParams = *ptParams;
 
@@ -144,11 +137,9 @@ arm_fsm_rt_t __arm_2d_cccn888_sw_user_opcode_template( __arm_2d_sub_task_t *ptTa
 
     assert(ARM_2D_COLOUR_SZ_32BIT == OP_CORE.ptOp->Info.Colour.u3ColourSZ);
 
-    __arm_2d_impl_cccn888_user_opcode_template( ptTask->Param.tCopy.tSource.pBuffer,
-                                                ptTask->Param.tCopy.tSource.iStride,
-                                                ptTask->Param.tCopy.tTarget.pBuffer,
-                                                ptTask->Param.tCopy.tTarget.iStride,
-                                                &ptTask->Param.tCopy.tCopySize,
+    __arm_2d_impl_cccn888_user_opcode_template( ptTask->Param.tTileProcess.pBuffer,
+                                                ptTask->Param.tTileProcess.iStride,
+                                                &(ptTask->Param.tTileProcess.tValidRegion.tSize),
                                                 &this.tParams);
 
     return arm_fsm_rt_cpl;
@@ -277,12 +268,10 @@ void blur_filter (uint32_t * data, int16_t iWidth, int16_t iHeight, int16_t iTar
 /* default low level implementation */
 __WEAK
 void __arm_2d_impl_cccn888_user_opcode_template(
-                                    uint32_t *__RESTRICT pwSource,
-                                    int16_t iSourceStride,
-                                    uint32_t *__RESTRICT pwTarget,
-                                    int16_t iTargetStride,
-                                    arm_2d_size_t *__RESTRICT ptCopySize,
-                                    arm_2d_user_opcode_template_api_params_t *ptParam)
+                            uint32_t *__RESTRICT pwTarget,
+                            int16_t iTargetStride,
+                            arm_2d_size_t *__RESTRICT ptCopySize,
+                            arm_2d_user_opcode_template_api_params_t *ptParam)
 {
     int_fast16_t iWidth = ptCopySize->iWidth;
     int_fast16_t iHeight = ptCopySize->iHeight;
@@ -422,14 +411,13 @@ const __arm_2d_op_info_t ARM_2D_OP_USER_OPCODE_TEMPLATE = {
             .chScheme   = ARM_2D_COLOUR_CCCN888,
         },
         .Param = {
-            .bHasSource     = true,
+            .bHasSource     = false,
             .bHasTarget     = true,
         },
         .chOpIndex      = __ARM_2D_OP_IDX_USER_OPCODE_TEMPLATE,
         
         .LowLevelIO = {
-            .ptCopyLike = ref_low_lv_io(__ARM_2D_IO_USER_OPCODE_TEMPLATE_CCCN888),
-            .ptFillLike = NULL,
+            .ptTileProcessLike = ref_low_lv_io(__ARM_2D_IO_USER_OPCODE_TEMPLATE_CCCN888),
         },
     },
 };

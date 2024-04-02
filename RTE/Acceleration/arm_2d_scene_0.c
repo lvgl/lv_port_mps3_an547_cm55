@@ -333,7 +333,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                         };
 
                         arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
-                                                                &DEMO_IMAGE,
                                                                 ptTile,
                                                                 &__item_region,
                                                                 &tParams);
