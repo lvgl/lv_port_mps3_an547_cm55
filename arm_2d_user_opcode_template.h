@@ -45,8 +45,7 @@ extern "C" {
 
 typedef struct arm_2d_user_opcode_template_api_params_t {
     /* add your parameters here */
-    uint_fast8_t sigma;
-    uint_fast8_t chChannel;
+    uint_fast8_t chBlurDegree;
 } arm_2d_user_opcode_template_api_params_t;
 
 

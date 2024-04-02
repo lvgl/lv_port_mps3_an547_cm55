@@ -33,6 +33,7 @@
 #   include "arm_2d_helper.h"
 #   include "arm_2d_disp_adapters.h"
 #   include "arm_2d_scenes.h"
+#   include "arm_2d_scene_alarm_clock.h"
 #endif
 
 
@@ -107,6 +108,7 @@ int main(void)
     disp_adapter0_init();
     
     arm_2d_scene0_init(&DISP0_ADAPTER);
+    //arm_2d_scene_alarm_clock_init(&DISP0_ADAPTER);
 
     while(1) {
         disp_adapter0_task();
