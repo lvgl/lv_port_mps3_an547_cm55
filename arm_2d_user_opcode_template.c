@@ -60,8 +60,8 @@ extern "C" {
 
 #define OPCODE this.use_as__arm_2d_op_t
 
-#ifndef __ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__
-#   define __ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__ 0
+#ifndef __ARM_2D_CFG_USE_IIR_BLUR_REVERSE_PATH__
+#   define __ARM_2D_CFG_USE_IIR_BLUR_REVERSE_PATH__ 0
 #endif
       
 #define BLUR_ASM 0
@@ -80,10 +80,12 @@ enum {
 /*============================ PROTOTYPES ====================================*/
 extern
 void __arm_2d_impl_cccn888_user_opcode_template(
-                            uint32_t *__RESTRICT pTarget,
-                            int16_t iTargetStride,
-                            arm_2d_size_t *__RESTRICT ptCopySize,
-                            arm_2d_user_opcode_template_api_params_t *ptParam);
+                        uint32_t *__RESTRICT pwTarget,
+                        int16_t iTargetStride,
+                        arm_2d_region_t *__RESTRICT ptValidRegionOnVirtualScreen,
+                        arm_2d_region_t *ptTargetRegion,
+                        arm_2d_user_opcode_template_api_params_t *ptParam,
+                        arm_2d_scratch_mem_t *ptScratchMemory);
 
 
 extern 
@@ -123,6 +125,20 @@ arm_fsm_rt_t arm_2dp_cccn888_user_opcode_template(
 
     this.tParams = *ptParams;
 
+    if (NULL != (void *)this.tScratchMemory.pBuffer) {
+        arm_2d_size_t tSize;
+        if (NULL != ptRegion) {
+            tSize = ptRegion->tSize;
+        } else {
+            tSize = ptTarget->tRegion.tSize;
+        }
+
+        size_t tSizeInByte = (tSize.iHeight + tSize.iWidth) * (sizeof(__arm_2d_iir_blur_acc_t));
+        if (this.tScratchMemory.u24SizeInByte < tSizeInByte) {
+            return (arm_fsm_rt_t)ARM_2D_ERR_INSUFFICIENT_RESOURCE;
+        }
+    }
+
     return __arm_2d_op_invoke((arm_2d_op_core_t *)ptThis);
 }
 
@@ -137,10 +153,20 @@ arm_fsm_rt_t __arm_2d_cccn888_sw_user_opcode_template( __arm_2d_sub_task_t *ptTa
 
     assert(ARM_2D_COLOUR_SZ_32BIT == OP_CORE.ptOp->Info.Colour.u3ColourSZ);
 
-    __arm_2d_impl_cccn888_user_opcode_template( ptTask->Param.tTileProcess.pBuffer,
-                                                ptTask->Param.tTileProcess.iStride,
-                                                &(ptTask->Param.tTileProcess.tValidRegion.tSize),
-                                                &this.tParams);
+    arm_2d_region_t tTargetRegion = *this.use_as__arm_2d_op_t.Target.ptRegion;
+
+    tTargetRegion.tLocation 
+        = arm_2d_get_absolute_location( this.use_as__arm_2d_op_t.Target.ptTile,
+                                        tTargetRegion.tLocation,
+                                        true);
+
+    __arm_2d_impl_cccn888_user_opcode_template( 
+                        ptTask->Param.tTileProcess.pBuffer,
+                        ptTask->Param.tTileProcess.iStride,
+                        &(ptTask->Param.tTileProcess.tValidRegionInVirtualScreen),
+                        &tTargetRegion,
+                        &this.tParams,
+                        &this.tScratchMemory);
 
     return arm_fsm_rt_cpl;
 }
@@ -151,39 +177,98 @@ __WEAK
 void __arm_2d_impl_cccn888_user_opcode_template(
                             uint32_t *__RESTRICT pwTarget,
                             int16_t iTargetStride,
-                            arm_2d_size_t *__RESTRICT ptCopySize,
-                            arm_2d_user_opcode_template_api_params_t *ptParam)
+                            arm_2d_region_t *__RESTRICT ptValidRegionOnVirtualScreen,
+                            arm_2d_region_t *ptTargetRegionOnVirtualScreen,
+                            arm_2d_user_opcode_template_api_params_t *ptParam,
+                            arm_2d_scratch_mem_t *ptScratchMemory)
 {
-    int_fast16_t iWidth = ptCopySize->iWidth;
-    int_fast16_t iHeight = ptCopySize->iHeight;
+    int_fast16_t iWidth = ptValidRegionOnVirtualScreen->tSize.iWidth;
+    int_fast16_t iHeight = ptValidRegionOnVirtualScreen->tSize.iHeight;
   
     //blur_filter (pwTarget, iWidth, iHeight, iTargetStride, sigma);
     int16_t iY, iX, ibyte, ibit, ratio = 256 - ptParam->chBlurDegree;
-    uint16_t accuR, accuG, accuB;
+
+    __arm_2d_iir_blur_acc_t tAcc;
+    //uint16_t accuR, accuG, accuB;
     uint8_t *pchChannel = NULL;
+
+    __arm_2d_iir_blur_acc_t *ptStatusH = NULL;
+    __arm_2d_iir_blur_acc_t *ptStatusV = NULL;
+    
+    if (NULL != (void *)ptScratchMemory->pBuffer) {
+        ptStatusH = (__arm_2d_iir_blur_acc_t *)ptScratchMemory->pBuffer;
+        ptStatusV = ptStatusH + ptTargetRegionOnVirtualScreen->tSize.iWidth;
+    }
+
+    /* calculate the offset between the target region and the valid region */
+    arm_2d_location_t tOffset = {
+        .iX = ptValidRegionOnVirtualScreen->tLocation.iX - ptTargetRegionOnVirtualScreen->tLocation.iX,
+        .iY = ptValidRegionOnVirtualScreen->tLocation.iY - ptTargetRegionOnVirtualScreen->tLocation.iY,
+    };
+
+    /*
+         Virtual Screen
+         +--------------------------------------------------------------+
+         |                                                              |
+         |        Target Region                                         |
+         |       +-------------------------------------------+          |
+         |       |                                           |          |
+         |       |                  +-------------------+    |          |
+         |       |                  | Valid Region      |    |          |
+         |       |                  |                   |    |          |
+         |       |                  +-------------------+    |          |     
+         |       |                                           |          |
+         |       |                                           |          |     
+         |       +-------------------------------------------+          |
+         +--------------------------------------------------------------+     
+     
+         NOTE: 1. Both the Target Region and the Valid Region are relative
+                  regions of the virtual Screen in this function.
+               2. The Valid region is always inside the Target Region.
+               3. tOffset is the relative location between the Valid Region
+                  and the Target Region.
+               4. The Valid Region marks the location and size of the current
+                  working buffer on the virtual screen. Only the valid region
+                  contains a valid buffer.
+     */
     
     uint32_t *pwPixel = pwTarget;
 
     /* rows direct path */
+
+    ptStatusV += tOffset.iY;
+
     for (iY = 0; iY < iHeight; iY++) {   
 
 #if BLUR_ASM
         blur_filter_asm(pwPixel, iWidth, 1, ratio);            
-#else        
-        pchChannel = (unsigned char *)pwPixel;     /* read RGBA 8888  */
-        accuR = *pchChannel++;
-        accuG = *pchChannel++;
-        accuB = *pchChannel++;
+#else
+        if (NULL != ptStatusV && tOffset.iX > 0) {
+            /* recover the previous statues */
+            tAcc = *ptStatusV;
+
+        } else {
+            pchChannel = (unsigned char *)pwPixel;
+
+            tAcc.hwR = *pchChannel++;
+            tAcc.hwG = *pchChannel++;
+            tAcc.hwB = *pchChannel++;
+        }
 
         pchChannel = (unsigned char *)pwPixel;
 
         for (iX = 0; iX < iWidth; iX++) {
 
-            accuR += ((*pchChannel) - accuR) * ratio >> 8;  *pchChannel++ = accuR;
-            accuG += ((*pchChannel) - accuG) * ratio >> 8;  *pchChannel++ = accuG;
-            accuB += ((*pchChannel) - accuB) * ratio >> 8;  *pchChannel++ = accuB;
+            tAcc.hwR += ((*pchChannel) - tAcc.hwR) * ratio >> 8;  *pchChannel++ = tAcc.hwR;
+            tAcc.hwG += ((*pchChannel) - tAcc.hwG) * ratio >> 8;  *pchChannel++ = tAcc.hwG;
+            tAcc.hwB += ((*pchChannel) - tAcc.hwB) * ratio >> 8;  *pchChannel++ = tAcc.hwB;
 
             pchChannel++;                  /* skip A */
+        }
+
+        if (NULL != ptStatusV) {
+            /* save the last pixel */
+            *ptStatusV++ = tAcc;
         }
 #endif
 
@@ -191,8 +276,8 @@ void __arm_2d_impl_cccn888_user_opcode_template(
           
     }
 
-#if defined(__ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__)                    \
- && __ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__
+#if defined(__ARM_2D_CFG_USE_IIR_BLUR_REVERSE_PATH__)                    \
+ && __ARM_2D_CFG_USE_IIR_BLUR_REVERSE_PATH__
     /* rows reverse path */
     
     pwPixel = &(pwTarget[(iWidth-1) + (iHeight-1)*iTargetStride]);
@@ -200,17 +285,17 @@ void __arm_2d_impl_cccn888_user_opcode_template(
     for (iY = iHeight-1; iY > 0; iY--) {   
         
         pchChannel = (uint8_t *)pwPixel;     /* read RGBA 8888  */
-        accuR = *pchChannel++;
-        accuG = *pchChannel++;
-        accuB = *pchChannel++;
+        tAcc.hwR = *pchChannel++;
+        tAcc.hwG = *pchChannel++;
+        tAcc.hwB = *pchChannel++;
 
         pchChannel = (uint8_t *)pwPixel;
 
         for (iX = 0; iX < iWidth; iX++)
         {   
-            accuR += ((*pchChannel) - accuR) * ratio >> 8;  *pchChannel++ = accuR;
-            accuG += ((*pchChannel) - accuG) * ratio >> 8;  *pchChannel++ = accuG;
-            accuB += ((*pchChannel) - accuB) * ratio >> 8;  *pchChannel++ = accuB;
+            tAcc.hwR += ((*pchChannel) - tAcc.hwR) * ratio >> 8;  *pchChannel++ = tAcc.hwR;
+            tAcc.hwG += ((*pchChannel) - tAcc.hwG) * ratio >> 8;  *pchChannel++ = tAcc.hwG;
+            tAcc.hwB += ((*pchChannel) - tAcc.hwB) * ratio >> 8;  *pchChannel++ = tAcc.hwB;
 
             pchChannel -= 7;
         }
@@ -223,33 +308,45 @@ void __arm_2d_impl_cccn888_user_opcode_template(
 
     pwPixel = pwTarget;
 
+    ptStatusH += tOffset.iX;
+
     /* columns direct path */
     for (iX = 0; iX < iWidth; iX++) {     
 #if BLUR_ASM
         blur_filter_asm(pwPixel, iWidth, iTargetStride, ratio);            
-#else          
-        pchChannel = (uint8_t *)pwPixel;     /* read RGBA 8888  */
-        accuR = *pchChannel++;
-        accuG = *pchChannel++;
-        accuB = *pchChannel++;
-
+#else
+        if (NULL != ptStatusH && tOffset.iY > 0) {
+            /* recover the previous statues */
+            tAcc = *ptStatusH;
+        } else {
+            pchChannel = (uint8_t *)pwPixel;     /* read RGBA 8888  */
+            tAcc.hwR = *pchChannel++;
+            tAcc.hwG = *pchChannel++;
+            tAcc.hwB = *pchChannel++;
+        }
         pchChannel = (uint8_t *)pwPixel++;
         
         for (iY = 0; iY < iHeight; iY++) {
 
-            accuR += ((*pchChannel) - accuR) * ratio >> 8;  *pchChannel++ = accuR;
-            accuG += ((*pchChannel) - accuG) * ratio >> 8;  *pchChannel++ = accuG;
-            accuB += ((*pchChannel) - accuB) * ratio >> 8;  *pchChannel++ = accuB;
+            tAcc.hwR += ((*pchChannel) - tAcc.hwR) * ratio >> 8;  *pchChannel++ = tAcc.hwR;
+            tAcc.hwG += ((*pchChannel) - tAcc.hwG) * ratio >> 8;  *pchChannel++ = tAcc.hwG;
+            tAcc.hwB += ((*pchChannel) - tAcc.hwB) * ratio >> 8;  *pchChannel++ = tAcc.hwB;
 
             pchChannel += (iTargetStride*4) - 3;
         }
+
+        if (NULL != ptStatusH) {
+            /* save the last pixel */
+            *ptStatusH++ = tAcc;
+        }
+
 #endif        
     }
 #endif
 
 
-#if defined(__ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__)                    \
- && __ARM_2D_CFG_USE_IIR_BLUR_ENABLE_REVERSE_PATH__
+#if defined(__ARM_2D_CFG_USE_IIR_BLUR_REVERSE_PATH__)                    \
+ && __ARM_2D_CFG_USE_IIR_BLUR_REVERSE_PATH__
 
     pwPixel = &(pwTarget[iWidth-1 + (iHeight-1)*iTargetStride]);
 
@@ -257,17 +354,17 @@ void __arm_2d_impl_cccn888_user_opcode_template(
     for (iX = iWidth-1; iX > 0; iX--)
     {   
         pchChannel = (uint8_t *)pwPixel;     /* read RGBA 8888  */
-        accuR = *pchChannel++;
-        accuG = *pchChannel++;
-        accuB = *pchChannel++;
+        tAcc.hwR = *pchChannel++;
+        tAcc.hwG = *pchChannel++;
+        tAcc.hwB = *pchChannel++;
 
         pchChannel = (uint8_t *)pwPixel--;
 
         for (iY = 0; iY < iHeight; iY++)
         {   
-            accuR += ((*pchChannel) - accuR) * ratio >> 8;  *pchChannel++ = accuR;
-            accuG += ((*pchChannel) - accuG) * ratio >> 8;  *pchChannel++ = accuG;
-            accuB += ((*pchChannel) - accuB) * ratio >> 8;  *pchChannel++ = accuB;
+            tAcc.hwR += ((*pchChannel) - tAcc.hwR) * ratio >> 8;  *pchChannel++ = tAcc.hwR;
+            tAcc.hwG += ((*pchChannel) - tAcc.hwG) * ratio >> 8;  *pchChannel++ = tAcc.hwG;
+            tAcc.hwB += ((*pchChannel) - tAcc.hwB) * ratio >> 8;  *pchChannel++ = tAcc.hwB;
 
             pchChannel -= 3 + (iTargetStride*4);
         }

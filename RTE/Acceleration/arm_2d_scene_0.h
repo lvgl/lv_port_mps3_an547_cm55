@@ -80,11 +80,11 @@ struct user_scene_0_t {
 
 ARM_PRIVATE(
     /* place your private member here, following two are examples */
-    int64_t lTimestamp[1];
+    int64_t lTimestamp[2];
     bool bUserAllocated;
     uint8_t chBlurDegree;
 
-    arm_2d_user_opcode_template_descriptor_t tUserOPCODETemplate;
+    arm_2d_user_opcode_template_descriptor_t tUserOPCODETemplate[3];
 
 )
     /* place your public member here */

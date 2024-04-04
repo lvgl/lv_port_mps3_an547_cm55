@@ -124,7 +124,11 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
         *ptItem = 0;
     }
 
-    ARM_2D_OP_DEPOSE(this.tUserOPCODETemplate);
+    arm_foreach(arm_2d_user_opcode_template_descriptor_t,
+                this.tUserOPCODETemplate, 
+                ptOP) {
+        ARM_2D_OP_DEPOSE(*ptOP);
+    }
 
     if (!this.bUserAllocated) {
         __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
@@ -154,10 +158,41 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
 {
     user_scene_0_t *ptThis = (user_scene_0_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-    this.chBlurDegree++;
-    if (this.chBlurDegree > (255 - 16)) {
+
+    do {
+        int32_t nResult;
+        arm_2d_helper_time_cos_slider(128, 255-16, 10000, 0, &nResult, &this.lTimestamp[1]);
+        this.chBlurDegree = nResult;
+    } while(0);
+
+#if 0
+    this.chBlurDegree--;
+    if (this.chBlurDegree < 16) {
         this.chBlurDegree = 128;
     }
+#endif
+#if 0
+    arm_foreach(arm_2d_user_opcode_template_descriptor_t,
+                this.tUserOPCODETemplate, 
+                ptOP) {
+        /* get the screen region */
+        arm_2d_size_t tSize 
+            = arm_2d_scene_player_get_screen_size(this.use_as__arm_2d_scene_t.ptPlayer);
+        size_t tMemorySize = (tSize.iHeight + tSize.iWidth) * sizeof(__arm_2d_iir_blur_acc_t);
+
+        ptOP->tScratchMemory.pBuffer 
+            = (uintptr_t)__arm_2d_allocate_scratch_memory( 
+                                                tMemorySize , 
+                                                __alignof__(__arm_2d_iir_blur_acc_t),
+                                                ARM_2D_MEM_TYPE_FAST);
+
+        ptOP->tScratchMemory.u24SizeInByte = tMemorySize;
+        ptOP->tScratchMemory.u2Align = __alignof__(__arm_2d_iir_blur_acc_t);
+        ptOP->tScratchMemory.u2ItemSize = sizeof(__arm_2d_iir_blur_acc_t);
+        ptOP->tScratchMemory.u2Type = ARM_2D_MEM_TYPE_FAST;
+
+    }
+#endif
 }
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
@@ -171,6 +206,14 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
         arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
     }
 #endif
+
+    arm_foreach(arm_2d_user_opcode_template_descriptor_t,
+                this.tUserOPCODETemplate, 
+                ptOP) {
+        __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_FAST, 
+                                    (void *)ptOP->tScratchMemory.pBuffer);
+        ptOP->tScratchMemory.u24SizeInByte = 0;
+    }
 }
 
 static void __before_scene0_switching_out(arm_2d_scene_t *ptScene)
@@ -227,8 +270,8 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                     }
                 }
             }
-#endif
-#if 0
+
+
             /* cell 2, algorithm 1 */
             __item_horizontal(tCell, 2,2,2,2) {
                 
@@ -241,7 +284,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
 
                         arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
-                        arm_lcd_print_banner("Algorithm 1", __item_region);
+                        arm_lcd_print_banner("Blur Degree: 128", __item_region);
                     }
 
                     __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
@@ -250,12 +293,28 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                                                 ptTile,
                                                 &__item_region);
 
+                        if (bIsNewFrame) {
+                            arm_2d_user_opcode_template_descriptor_t *ptOP = &this.tUserOPCODETemplate[0];
+                            size_t tMemorySize = (__item_region.tSize.iHeight + __item_region.tSize.iWidth) 
+                                               * sizeof(__arm_2d_iir_blur_acc_t);
+
+                            ptOP->tScratchMemory.pBuffer 
+                                = (uintptr_t)__arm_2d_allocate_scratch_memory( 
+                                                                    tMemorySize , 
+                                                                    __alignof__(__arm_2d_iir_blur_acc_t),
+                                                                    ARM_2D_MEM_TYPE_FAST);
+
+                            ptOP->tScratchMemory.u24SizeInByte = tMemorySize;
+                            ptOP->tScratchMemory.u2Align = __alignof__(__arm_2d_iir_blur_acc_t);
+                            ptOP->tScratchMemory.u2ItemSize = sizeof(__arm_2d_iir_blur_acc_t);
+                            ptOP->tScratchMemory.u2Type = ARM_2D_MEM_TYPE_FAST;
+                        }
+
                         arm_2d_user_opcode_template_api_params_t tParams = {
                             .chBlurDegree = 128,
                         };
 
-                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
-                                                                &DEMO_IMAGE,
+                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate[0],
                                                                 ptTile,
                                                                 &__item_region,
                                                                 &tParams);
@@ -277,7 +336,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
 
                         arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
-                        arm_lcd_print_banner("Algorithm 2", __item_region);
+                        arm_lcd_print_banner("Blur Degree: 239", __item_region);
                     }
 
                     __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
@@ -286,12 +345,28 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                                                 ptTile,
                                                 &__item_region);
 
+                        if (bIsNewFrame) {
+                            arm_2d_user_opcode_template_descriptor_t *ptOP = &this.tUserOPCODETemplate[1];
+                            size_t tMemorySize = (__item_region.tSize.iHeight + __item_region.tSize.iWidth) 
+                                               * sizeof(__arm_2d_iir_blur_acc_t);
+
+                            ptOP->tScratchMemory.pBuffer 
+                                = (uintptr_t)__arm_2d_allocate_scratch_memory( 
+                                                                    tMemorySize , 
+                                                                    __alignof__(__arm_2d_iir_blur_acc_t),
+                                                                    ARM_2D_MEM_TYPE_FAST);
+
+                            ptOP->tScratchMemory.u24SizeInByte = tMemorySize;
+                            ptOP->tScratchMemory.u2Align = __alignof__(__arm_2d_iir_blur_acc_t);
+                            ptOP->tScratchMemory.u2ItemSize = sizeof(__arm_2d_iir_blur_acc_t);
+                            ptOP->tScratchMemory.u2Type = ARM_2D_MEM_TYPE_FAST;
+                        }
+
                         arm_2d_user_opcode_template_api_params_t tParams = {
-                            .chBlurDegree = 32
+                            .chBlurDegree = 255 - 16
                         };
 
-                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
-                                                                &DEMO_IMAGE,
+                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate[1],
                                                                 ptTile,
                                                                 &__item_region,
                                                                 &tParams);
@@ -299,7 +374,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                     }
                 }
             }
-
 
 #endif
             /* cell 3, algorithm 3 */
@@ -328,11 +402,28 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                                                 ptTile,
                                                 &__item_region);
 
+                        if (bIsNewFrame) {
+                            arm_2d_user_opcode_template_descriptor_t *ptOP = &this.tUserOPCODETemplate[2];
+                            size_t tMemorySize = (__item_region.tSize.iHeight + __item_region.tSize.iWidth) 
+                                               * sizeof(__arm_2d_iir_blur_acc_t);
+
+                            ptOP->tScratchMemory.pBuffer 
+                                = (uintptr_t)__arm_2d_allocate_scratch_memory( 
+                                                                    tMemorySize , 
+                                                                    __alignof__(__arm_2d_iir_blur_acc_t),
+                                                                    ARM_2D_MEM_TYPE_FAST);
+
+                            ptOP->tScratchMemory.u24SizeInByte = tMemorySize;
+                            ptOP->tScratchMemory.u2Align = __alignof__(__arm_2d_iir_blur_acc_t);
+                            ptOP->tScratchMemory.u2ItemSize = sizeof(__arm_2d_iir_blur_acc_t);
+                            ptOP->tScratchMemory.u2Type = ARM_2D_MEM_TYPE_FAST;
+                        }
+
                         arm_2d_user_opcode_template_api_params_t tParams = {
                             .chBlurDegree = this.chBlurDegree,
                         };
 
-                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
+                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate[2],
                                                                 ptTile,
                                                                 &__item_region,
                                                                 &tParams);
@@ -340,8 +431,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                     }
                 }
             }
-
-
 
         }
 
@@ -432,7 +521,11 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
         .bUserAllocated = bUserAllocated,
     };
     
-    ARM_2D_OP_INIT(this.tUserOPCODETemplate);
+    arm_foreach(arm_2d_user_opcode_template_descriptor_t,
+                this.tUserOPCODETemplate, 
+                ptOP) {
+        ARM_2D_OP_INIT(*ptOP);
+    }
 
     this.chBlurDegree = 128;
 

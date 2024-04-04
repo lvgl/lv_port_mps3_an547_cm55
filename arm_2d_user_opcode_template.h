@@ -42,6 +42,11 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef struct __arm_2d_iir_blur_acc_t {
+    uint16_t hwR;
+    uint16_t hwG;
+    uint16_t hwB;
+} __arm_2d_iir_blur_acc_t;
 
 typedef struct arm_2d_user_opcode_template_api_params_t {
     /* add your parameters here */
@@ -50,12 +55,15 @@ typedef struct arm_2d_user_opcode_template_api_params_t {
 
 
 typedef struct arm_2d_user_opcode_template_descriptor_t {
+ARM_PRIVATE(
     implement(arm_2d_op_t);                         /* inherit from base class arm_2d_op_cp_t*/
 
     arm_2d_user_opcode_template_api_params_t tParams;
+)
+
+    arm_2d_scratch_mem_t tScratchMemory;
 
 }arm_2d_user_opcode_template_descriptor_t;
-
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
