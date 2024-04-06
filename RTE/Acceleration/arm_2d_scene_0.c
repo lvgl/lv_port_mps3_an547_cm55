@@ -64,21 +64,21 @@
 #if __GLCD_CFG_COLOUR_DEPTH__ == 8
 
 #   define c_tileBuff               c_tileBuffGRAY8
-#   define c_tileLenna              c_tileLennaGRAY8
+#   define c_tileTestImageCuisine   c_tileTestImageCuisineGRAY8
 #   define c_tileCMSISLogo          c_tileCMSISLogoGRAY8
 #   define c_tileBackground         c_tileBackgroundGRAY8
 
 #elif __GLCD_CFG_COLOUR_DEPTH__ == 16
 
 #   define c_tileBuff               c_tileBuffRGB565
-#   define c_tileLenna              c_tileLennaRGB565
+#   define c_tileTestImageCuisine   c_tileTestImageCuisineRGB565
 #   define c_tileCMSISLogo          c_tileCMSISLogoRGB565
 #   define c_tileBackground         c_tileBackgroundRGB565
 
 #elif __GLCD_CFG_COLOUR_DEPTH__ == 32
 
 #   define c_tileBuff               c_tileBuffCCCA8888
-#   define c_tileLenna              c_tileLennaCCCN888
+#   define c_tileTestImageCuisine   c_tileTestImageCuisineCCCN888
 #   define c_tileCMSISLogo          c_tileCMSISLogoCCCA8888
 #   define c_tileBackground         c_tileBackgroundCCCA8888
 
@@ -86,7 +86,7 @@
 #   error Unsupported colour depth!
 #endif
 
-#define DEMO_IMAGE                    c_tileLenna //c_tileBuff
+#define DEMO_IMAGE                    c_tileTestImageCuisine //c_tileBuff
 
 #if __DISP0_CFG_PFB_BLOCK_WIDTH__ == __DISP0_CFG_SCEEN_WIDTH__                  \
  && __DISP0_CFG_PFB_BLOCK_HEIGHT__ == __DISP0_CFG_SCEEN_HEIGHT__
@@ -103,7 +103,8 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const arm_2d_tile_t c_tileLenna;
+extern const arm_2d_tile_t c_tileTestImageCuisine;
+
 extern const arm_2d_tile_t c_tileBuff;
 
 extern const arm_2d_tile_t c_tileCMSISLogo;
@@ -319,10 +320,10 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                             .chBlurDegree = 128,
                         };
 
-                        arm_2dp_filter_iir_blur(   &this.tUserOPCODETemplate[0],
-                                                                ptTile,
-                                                                &__item_region,
-                                                                &tParams);
+                        arm_2dp_filter_iir_blur(&this.tUserOPCODETemplate[0],
+                                                ptTile,
+                                                &__item_region,
+                                                &tParams);
 
                     }
                 }
@@ -371,10 +372,10 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                             .chBlurDegree = 255 - 16
                         };
 
-                        arm_2dp_filter_iir_blur(   &this.tUserOPCODETemplate[1],
-                                                                ptTile,
-                                                                &__item_region,
-                                                                &tParams);
+                        arm_2dp_filter_iir_blur(&this.tUserOPCODETemplate[1],
+                                                ptTile,
+                                                &__item_region,
+                                                &tParams);
 
                     }
                 }
@@ -428,10 +429,10 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                             .chBlurDegree = this.chBlurDegree,
                         };
 
-                        arm_2dp_filter_iir_blur(   &this.tUserOPCODETemplate[2],
-                                                                ptTile,
-                                                                &__item_region,
-                                                                &tParams);
+                        arm_2dp_filter_iir_blur(&this.tUserOPCODETemplate[2],
+                                                ptTile,
+                                                &__item_region,
+                                                &tParams);
                     }
                 }
             }
