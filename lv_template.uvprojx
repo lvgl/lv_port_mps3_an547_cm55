@@ -445,11 +445,6 @@
               <FilePath>.\app_cfg.h</FilePath>
             </File>
             <File>
-              <FileName>Lenna.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Lenna.c</FilePath>
-            </File>
-            <File>
               <FileName>buff.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\buff.c</FilePath>
