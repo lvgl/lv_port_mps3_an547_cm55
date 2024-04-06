@@ -417,30 +417,6 @@
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>13</FileNumber>
-      <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\arm_2d_user_opcode_template.h</PathWithFileName>
-      <FilenameWithoutPath>arm_2d_user_opcode_template.h</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>14</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>.\arm_2d_user_opcode_template.c</PathWithFileName>
-      <FilenameWithoutPath>arm_2d_user_opcode_template.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>15</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -452,7 +428,7 @@
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
-      <FileNumber>16</FileNumber>
+      <FileNumber>14</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>

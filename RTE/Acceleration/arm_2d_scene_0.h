@@ -26,7 +26,6 @@
 #ifdef RTE_Acceleration_Arm_2D_Scene0
 
 #include "arm_2d_helper_scene.h"
-#include "arm_2d_user_opcode_template.h"
 
 #ifdef   __cplusplus
 extern "C" {
@@ -84,7 +83,7 @@ ARM_PRIVATE(
     bool bUserAllocated;
     uint8_t chBlurDegree;
 
-    arm_2d_user_opcode_template_descriptor_t tUserOPCODETemplate[3];
+    arm_2d_filter_iir_blur_descriptor_t tUserOPCODETemplate[3];
 
 )
     /* place your public member here */
