@@ -91,24 +91,6 @@ void next_stage_process(int16_t iWidth, int16_t iHeight, uint8_t *pchBitmap)
 
 #include "arm_2d_helper.h"
 
-
-
-
-extern const uint16_t c_bmpHeliumRGB565[];
-
-const arm_2d_tile_t c_tileInput = {
-    .tRegion = {
-        .tSize = {
-            .iWidth = 320,
-            .iHeight = 256,
-        },
-    },
-    .tInfo = {
-        .bIsRoot = true,
-    },
-    .phwBuffer = (uint16_t*)c_bmpHeliumRGB565,
-};
-
 /*
  * NOTE: working buffer
  *       it will generate a section called ".bss.noinit.tileStaticFBOutput",
@@ -233,6 +215,24 @@ void scaling_isp_ouput_to_fit_ai_input_requirement(const arm_2d_tile_t *ptInput)
         /* the tileFastMemoryOutput will be freed automatically */
     }
 }
+
+
+extern const uint16_t c_bmpHeliumRGB565[];
+
+/* input pixel array descriptor */
+const arm_2d_tile_t c_tileInput = {
+    .tRegion = {
+        .tSize = {
+            .iWidth = 320,
+            .iHeight = 256,
+        },
+    },
+    .tInfo = {
+        .bIsRoot = true,
+    },
+    .phwBuffer = (uint16_t*)c_bmpHeliumRGB565,
+};
+
 
 int main(void)
 {
