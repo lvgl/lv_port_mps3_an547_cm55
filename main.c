@@ -111,7 +111,7 @@ const arm_2d_tile_t c_tileInput = {
 
 /*
  * NOTE: working buffer
- *       it will generate a section called ".bss.noinit.fast_framebuffer",
+ *       it will generate a section called ".bss.noinit.tileOutput",
  *       hence we can place it to DTCM.
  *
  */
