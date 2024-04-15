@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
+#include "arm_2d_helper.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -40,7 +42,7 @@ void Disp0_DrawBitmap(  int16_t x,
                         int16_t height, 
                         const uint8_t *bitmap)
 {
-#if __DISP0_CFG_COLOUR_DEPTH__ == 8
+#if __GLCD_CFG_COLOUR_DEPTH__ == 8
     extern
     void __arm_2d_impl_gray8_to_rgb565( uint8_t *__RESTRICT pchSourceBase,
                                         int16_t iSourceStride,
@@ -60,7 +62,7 @@ void Disp0_DrawBitmap(  int16_t x,
                                     width,
                                     &size);
     GLCD_DrawBitmap(x, y, width, height, (const uint8_t *)s_hwFrameBuffer);
-#elif __DISP0_CFG_COLOUR_DEPTH__ == 32
+#elif __GLCD_CFG_COLOUR_DEPTH__ == 32
     extern
     void __arm_2d_impl_cccn888_to_rgb565(uint32_t *__RESTRICT pwSourceBase,
                                         int16_t iSourceStride,
@@ -89,7 +91,7 @@ void next_stage_process(int16_t iWidth, int16_t iHeight, uint8_t *pchBitmap)
 }
 
 
-#include "arm_2d_helper.h"
+
 
 /*
  * NOTE: working buffer
@@ -97,7 +99,7 @@ void next_stage_process(int16_t iWidth, int16_t iHeight, uint8_t *pchBitmap)
  *       hence we can place it to DTCM.
  *
  */
-impl_fb( tileStaticFBOutput, 128, 128, uint16_t );
+impl_fb( tileStaticFBOutput, 128, 128, COLOUR_INT );
 
 
 void process_isp_ouput_with_static_framebuffer_in_dtcm(const arm_2d_tile_t *ptInput)
@@ -144,7 +146,7 @@ void process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(const a
     /* Temporarily allocate a framebuffer using FastMemory (inside DTCM)
      * NOTE: this buffer will be freed when quit the scope of the "{}" 
      */
-    impl_heap_fb(tileFastMemoryOutput, 128, 128, uint16_t) {
+    impl_heap_fb(tileFastMemoryOutput, 128, 128, COLOUR_INT) {
     
     
         arm_2d_region_t tFocusRegion = {
@@ -191,7 +193,7 @@ void scaling_isp_ouput_to_fit_ai_input_requirement(const arm_2d_tile_t *ptInput)
     /* Temporarily allocate a framebuffer using FastMemory (inside DTCM)
      * NOTE: this buffer will be freed when quit the scope of the "{}" 
      */
-    impl_heap_fb(tileFastMemoryOutput, 128, 128, uint16_t) {
+    impl_heap_fb(tileFastMemoryOutput, 128, 128, COLOUR_INT) {
 
         arm_2d_location_t tSourceCentre = {
             .iX = ptInput->tRegion.tSize.iWidth >> 1,
@@ -216,8 +218,15 @@ void scaling_isp_ouput_to_fit_ai_input_requirement(const arm_2d_tile_t *ptInput)
     }
 }
 
+#if __GLCD_CFG_COLOUR_DEPTH__ == 32
+#define c_bmpHeliumRGB      c_bmpHeliumCCCN888
+#elif __GLCD_CFG_COLOUR_DEPTH__ == 16
+#define c_bmpHeliumRGB      c_bmpHeliumRGB565
+#elif __GLCD_CFG_COLOUR_DEPTH__ == 8
+#define c_bmpHeliumRGB      c_bmpHeliumGRAY8
+#endif
 
-extern const uint16_t c_bmpHeliumRGB565[];
+extern const uint16_t c_bmpHeliumRGB[];
 
 /* input pixel array descriptor */
 const arm_2d_tile_t c_tileInput = {
@@ -230,7 +239,7 @@ const arm_2d_tile_t c_tileInput = {
     .tInfo = {
         .bIsRoot = true,
     },
-    .phwBuffer = (uint16_t*)c_bmpHeliumRGB565,
+    .nAddress = (uintptr_t)c_bmpHeliumRGB,
 };
 
 
@@ -238,9 +247,9 @@ int main(void)
 {
     arm_2d_init();
 
-    //process_isp_ouput_with_static_framebuffer_in_dtcm(&c_tileInput);
+    process_isp_ouput_with_static_framebuffer_in_dtcm(&c_tileInput);
     
-    process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(&c_tileInput);
+    //process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(&c_tileInput);
 
     //scaling_isp_ouput_to_fit_ai_input_requirement(&c_tileInput);
     
