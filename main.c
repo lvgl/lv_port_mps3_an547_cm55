@@ -118,9 +118,8 @@ const arm_2d_tile_t c_tileInput = {
 impl_fb( tileStaticFBOutput, 128, 128, uint16_t );
 
 
-void process_isp_ouput_with_static_framebuffer_in_dtcm(void)
+void process_isp_ouput_with_static_framebuffer_in_dtcm(const arm_2d_tile_t *ptInput)
 {
-
 
     arm_2d_region_t tFocusRegion = {
         /* focus on part of the input area (64, 64) */
@@ -128,12 +127,12 @@ void process_isp_ouput_with_static_framebuffer_in_dtcm(void)
             .iX = - 64, 
             .iY = - 64,
         },
-        .tSize = c_tileInput.tRegion.tSize,
+        .tSize = ptInput->tRegion.tSize,
     };
 
     /* load the input image and foucs on specific region */
     arm_2d_tile_copy_only(
-        &c_tileInput,           /* input tile */
+        ptInput,                /* input tile */
         &tileStaticFBOutput,    /* output tile */
         
         &tFocusRegion);         /* focus on part of the input area */
@@ -158,7 +157,7 @@ void process_isp_ouput_with_static_framebuffer_in_dtcm(void)
 }
 
 
-void process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(void)
+void process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(const arm_2d_tile_t *ptInput)
 {
     /* Temporarily allocate a framebuffer using FastMemory (inside DTCM)
      * NOTE: this buffer will be freed when quit the scope of the "{}" 
@@ -172,12 +171,12 @@ void process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(void)
                 .iX = - 64, 
                 .iY = - 64,
             },
-            .tSize = c_tileInput.tRegion.tSize,
+            .tSize = ptInput->tRegion.tSize,
         };
 
         /* load the input image and foucs on specific region */
         arm_2d_tile_copy_only(
-            &c_tileInput,               /* input tile */
+            ptInput,                    /* input tile */
             &tileFastMemoryOutput,      /* output tile */
             
             &tFocusRegion);             /* focus on part of the input area */
@@ -205,7 +204,7 @@ void process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(void)
     }
 }
 
-void scaling_isp_ouput_to_fit_ai_input_requirement(void)
+void scaling_isp_ouput_to_fit_ai_input_requirement(const arm_2d_tile_t *ptInput)
 {
     /* Temporarily allocate a framebuffer using FastMemory (inside DTCM)
      * NOTE: this buffer will be freed when quit the scope of the "{}" 
@@ -213,12 +212,12 @@ void scaling_isp_ouput_to_fit_ai_input_requirement(void)
     impl_heap_fb(tileFastMemoryOutput, 128, 128, uint16_t) {
 
         arm_2d_location_t tSourceCentre = {
-            .iX = c_tileInput.tRegion.tSize.iWidth >> 1,
-            .iY = c_tileInput.tRegion.tSize.iHeight >> 1,
+            .iX = ptInput->tRegion.tSize.iWidth >> 1,
+            .iY = ptInput->tRegion.tSize.iHeight >> 1,
         };
 
         arm_2d_rgb565_tile_scaling_only(
-            &c_tileInput,               /* input tile */
+            ptInput,               /* input tile */
             &tileFastMemoryOutput,      /* output tile */
             NULL,
             tSourceCentre,
@@ -239,11 +238,11 @@ int main(void)
 {
     arm_2d_init();
 
-    //process_isp_ouput_with_static_framebuffer_in_dtcm();
+    //process_isp_ouput_with_static_framebuffer_in_dtcm(&c_tileInput);
     
-    process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory();
+    process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(&c_tileInput);
 
-    //scaling_isp_ouput_to_fit_ai_input_requirement();
+    //scaling_isp_ouput_to_fit_ai_input_requirement(&c_tileInput);
     
     while(1) {
     }
