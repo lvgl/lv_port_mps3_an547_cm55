@@ -111,16 +111,16 @@ const arm_2d_tile_t c_tileInput = {
 
 /*
  * NOTE: working buffer
- *       it will generate a section called ".bss.noinit.tileOutput",
+ *       it will generate a section called ".bss.noinit.tileStaticFBOutput",
  *       hence we can place it to DTCM.
  *
  */
-impl_fb( tileOutput, 128, 128, uint16_t );
+impl_fb( tileStaticFBOutput, 128, 128, uint16_t );
 
 
 void process_isp_ouput_with_static_framebuffer_in_dtcm(void)
 {
-    arm_2d_init();
+
 
     arm_2d_region_t tFocusRegion = {
         /* focus on part of the input area (64, 64) */
@@ -134,7 +134,7 @@ void process_isp_ouput_with_static_framebuffer_in_dtcm(void)
     /* load the input image and foucs on specific region */
     arm_2d_tile_copy_only(
         &c_tileInput,           /* input tile */
-        &tileOutput,            /* output tile */
+        &tileStaticFBOutput,    /* output tile */
         
         &tFocusRegion);         /* focus on part of the input area */
 
@@ -146,24 +146,105 @@ void process_isp_ouput_with_static_framebuffer_in_dtcm(void)
     
     arm_2dp_filter_iir_blur(
         NULL,
-        &tileOutput,            /* the target buffer */
+        &tileStaticFBOutput,            /* the target buffer */
         NULL,
         &tParam
     );
 
     /* comsume the process result: for example, observe it on a LCD */
-    next_stage_process( tileOutput.tRegion.tSize.iWidth,
-                        tileOutput.tRegion.tSize.iHeight,
-                        tileOutput.pchBuffer);
+    next_stage_process( tileStaticFBOutput.tRegion.tSize.iWidth,
+                        tileStaticFBOutput.tRegion.tSize.iHeight,
+                        tileStaticFBOutput.pchBuffer);
 }
 
 
+void process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory(void)
+{
+    /* Temporarily allocate a framebuffer using FastMemory (inside DTCM)
+     * NOTE: this buffer will be freed when quit the scope of the "{}" 
+     */
+    impl_heap_fb(tileFastMemoryOutput, 128, 128, uint16_t) {
+    
+    
+        arm_2d_region_t tFocusRegion = {
+            /* focus on part of the input area (64, 64) */
+            .tLocation = {
+                .iX = - 64, 
+                .iY = - 64,
+            },
+            .tSize = c_tileInput.tRegion.tSize,
+        };
 
+        /* load the input image and foucs on specific region */
+        arm_2d_tile_copy_only(
+            &c_tileInput,               /* input tile */
+            &tileFastMemoryOutput,      /* output tile */
+            
+            &tFocusRegion);             /* focus on part of the input area */
+
+
+        /* the main 2D processing */
+        arm_2d_filter_iir_blur_api_params_t tParam = {
+            .chBlurDegree = 200,
+        };
+        
+        arm_2dp_filter_iir_blur(
+            NULL,
+            &tileFastMemoryOutput,            /* the target buffer */
+            NULL,
+            &tParam
+        );
+
+        /* comsume the process result: for example, observe it on a LCD */
+        next_stage_process( tileFastMemoryOutput.tRegion.tSize.iWidth,
+                            tileFastMemoryOutput.tRegion.tSize.iHeight,
+                            tileFastMemoryOutput.pchBuffer);
+    
+    
+        /* the tileFastMemoryOutput will be freed automatically */
+    }
+}
+
+void scaling_isp_ouput_to_fit_ai_input_requirement(void)
+{
+    /* Temporarily allocate a framebuffer using FastMemory (inside DTCM)
+     * NOTE: this buffer will be freed when quit the scope of the "{}" 
+     */
+    impl_heap_fb(tileFastMemoryOutput, 128, 128, uint16_t) {
+
+        arm_2d_location_t tSourceCentre = {
+            .iX = c_tileInput.tRegion.tSize.iWidth >> 1,
+            .iY = c_tileInput.tRegion.tSize.iHeight >> 1,
+        };
+
+        arm_2d_rgb565_tile_scaling_only(
+            &c_tileInput,               /* input tile */
+            &tileFastMemoryOutput,      /* output tile */
+            NULL,
+            tSourceCentre,
+            0.5f                        /* scaling factor */
+        );
+
+        /* comsume the process result: for example, observe it on a LCD */
+        next_stage_process( tileFastMemoryOutput.tRegion.tSize.iWidth,
+                            tileFastMemoryOutput.tRegion.tSize.iHeight,
+                            tileFastMemoryOutput.pchBuffer);
+    
+    
+        /* the tileFastMemoryOutput will be freed automatically */
+    }
+}
 
 int main(void)
 {
-    process_isp_ouput_with_static_framebuffer_in_dtcm();
+    arm_2d_init();
 
+    //process_isp_ouput_with_static_framebuffer_in_dtcm();
+    
+    process_isp_ouput_with_dynamic_allocated_framebuffer_in_fast_memory();
+
+    //scaling_isp_ouput_to_fit_ai_input_requirement();
+    
     while(1) {
     }
 }

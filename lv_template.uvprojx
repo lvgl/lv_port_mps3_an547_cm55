@@ -516,6 +516,12 @@
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
+      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Transform" Cvendor="ARM" Cversion="1.1.6" condition="Arm-2D-CORE">
+        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+        </targetInfos>
+      </component>
       <component Capiversion="2.2.0" Cclass="CMSIS Driver" Cgroup="USART" Cvendor="ARM" Cversion="1.0.0" condition="SSE-300-MPS3 USART">
         <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.3.0"/>
         <targetInfos>
