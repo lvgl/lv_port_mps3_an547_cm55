@@ -25,21 +25,6 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-#if defined(RTE_Acceleration_Arm_2D)
-#   include "arm_2d.h"
-#endif
-
-#if defined(RTE_Acceleration_Arm_2D_Helper_PFB)
-#   include "arm_2d_helper.h"
-#   include "arm_2d_disp_adapters.h"
-#   include "arm_2d_scenes.h"
-#   include "arm_2d_scene_alarm_clock.h"
-#   include "arm_2d_scene_atom.h"
-#endif
-
-
-
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -48,9 +33,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if defined(RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0)
-
-
+/* API to show result on LCD */
 void Disp0_DrawBitmap(  int16_t x, 
                         int16_t y, 
                         int16_t width, 
@@ -100,38 +83,89 @@ void Disp0_DrawBitmap(  int16_t x,
 #endif
 }
 
+void next_stage_process(int16_t iWidth, int16_t iHeight, uint8_t *pchBitmap)
+{
+    Disp0_DrawBitmap(0, 0, iWidth, iHeight, pchBitmap);
+}
 
 
-int main(void)
+#include "arm_2d_helper.h"
+
+
+
+
+extern const uint16_t c_bmpHeliumRGB565[];
+
+const arm_2d_tile_t c_tileInput = {
+    .tRegion = {
+        .tSize = {
+            .iWidth = 320,
+            .iHeight = 256,
+        },
+    },
+    .tInfo = {
+        .bIsRoot = true,
+    },
+    .phwBuffer = (uint16_t*)c_bmpHeliumRGB565,
+};
+
+/*
+ * NOTE: working buffer
+ *       it will generate a section called ".bss.noinit.fast_framebuffer",
+ *       hence we can place it to DTCM.
+ *
+ */
+impl_fb( tileOutput, 128, 128, uint16_t );
+
+
+void process_isp_ouput_with_static_framebuffer_in_dtcm(void)
 {
     arm_2d_init();
-    
-    disp_adapter0_init();
-    
-    arm_2d_scene_atom_init(&DISP0_ADAPTER);
-    //arm_2d_scene0_init(&DISP0_ADAPTER);
-    arm_2d_scene_alarm_clock_init(&DISP0_ADAPTER);
 
-    while(1) {
-        disp_adapter0_task();
-    }
+    arm_2d_region_t tFocusRegion = {
+        /* focus on part of the input area (64, 64) */
+        .tLocation = {
+            .iX = - 64, 
+            .iY = - 64,
+        },
+        .tSize = c_tileInput.tRegion.tSize,
+    };
+
+    /* load the input image and foucs on specific region */
+    arm_2d_tile_copy_only(
+        &c_tileInput,           /* input tile */
+        &tileOutput,            /* output tile */
+        
+        &tFocusRegion);         /* focus on part of the input area */
+
+
+    /* the main 2D processing */
+    arm_2d_filter_iir_blur_api_params_t tParam = {
+        .chBlurDegree = 200,
+    };
+    
+    arm_2dp_filter_iir_blur(
+        NULL,
+        &tileOutput,            /* the target buffer */
+        NULL,
+        &tParam
+    );
+
+    /* comsume the process result: for example, observe it on a LCD */
+    next_stage_process( tileOutput.tRegion.tSize.iWidth,
+                        tileOutput.tRegion.tSize.iHeight,
+                        tileOutput.pchBuffer);
 }
 
 
-#else
+
 
 int main(void)
 {
-    printf("Hello LVGL!!\r\n");
-    
-    __cycleof__("Draw strings on LCD") {
-        __LL_LCD_PRINT_BANNER("Hello LVGL!!");
-    }
-    
+    process_isp_ouput_with_static_framebuffer_in_dtcm();
+
     while(1) {
-    
     }
-    
 }
 
-#endif
+

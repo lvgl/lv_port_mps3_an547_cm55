@@ -27,10 +27,14 @@
 
 #include "app_cfg.h"
 #include <stddef.h>
-#include "perf_counter.h"
+
 #include "cmsis_compiler.h"
 #include "RTE_Components.h"             /* Component selection */
 #include CMSIS_device_header
+
+#if defined(__PERF_COUNTER__)
+#   include "perf_counter.h"
+#endif
 
 #include "GLCD_Config.h"
 #include "Board_GLCD.h"

@@ -20,7 +20,9 @@
 #if defined(_RTE_)
 #   include "RTE_Components.h"
 #endif
+#if defined(__PERF_COUNTER__)
 #include "perf_counter.h"
+#endif
 #include "led_port.h"
 #include "serial.h"
 #include "Board_GLCD.h"
