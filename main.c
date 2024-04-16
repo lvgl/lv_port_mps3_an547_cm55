@@ -200,7 +200,7 @@ void scaling_isp_ouput_to_fit_ai_input_requirement(const arm_2d_tile_t *ptInput)
             .iY = ptInput->tRegion.tSize.iHeight >> 1,
         };
 
-        arm_2d_rgb565_tile_scaling_only(
+        arm_2d_tile_scaling_only(
             ptInput,               /* input tile */
             &tileFastMemoryOutput,      /* output tile */
             NULL,

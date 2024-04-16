@@ -449,6 +449,11 @@
               <FileType>1</FileType>
               <FilePath>.\helium.c</FilePath>
             </File>
+            <File>
+              <FileName>iir_blur_helium.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\iir_blur_helium.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
