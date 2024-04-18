@@ -60,10 +60,10 @@ void __arm_2d_impl_gray8_filter_iir_blur(
 
 /* To move to a .h*/
 typedef struct __arm_2d_iir_blur_helium_acc_cccn888_t {
-	uint8_t hwR;
-	uint8_t hwG;
-	uint8_t hwB;
-	uint8_t hwA;
+    uint8_t hwR;
+    uint8_t hwG;
+    uint8_t hwB;
+    uint8_t hwA;
 } __arm_2d_iir_blur_helium_acc_cccn888_t;
 /* */
 __OVERRIDE_WEAK
@@ -75,183 +75,183 @@ void __arm_2d_impl_cccn888_filter_iir_blur(
                             uint8_t chBlurDegree,
                             arm_2d_scratch_mem_t *ptScratchMemory)
 {
-	int8x16_t v_sub;
-	uint32x4_t v_previous_init;
-	uint8x16_t v_previous;
-	uint8x16_t v_data;
-	chBlurDegree = 255 - chBlurDegree; 
-	int8x16_t v_ratio = vdupq_n_s8(chBlurDegree>>1);
-	uint16_t iHeight = ptValidRegionOnVirtualScreen->tSize.iHeight;
-	uint16_t iWidth = ptValidRegionOnVirtualScreen->tSize.iWidth;
+    int8x16_t v_sub;
+    uint32x4_t v_previous_init;
+    uint8x16_t v_previous;
+    uint8x16_t v_data;
+    chBlurDegree = 255 - chBlurDegree; 
+    int8x16_t v_ratio = vdupq_n_s8(chBlurDegree>>1);
+    uint16_t iHeight = ptValidRegionOnVirtualScreen->tSize.iHeight;
+    uint16_t iWidth = ptValidRegionOnVirtualScreen->tSize.iWidth;
 
-	__arm_2d_iir_blur_helium_acc_cccn888_t *ptStatusH = NULL;
-	__arm_2d_iir_blur_helium_acc_cccn888_t *ptStatusV = NULL;
-	if (NULL != (void *)ptScratchMemory->pBuffer)
-	{
-		ptStatusH = (__arm_2d_iir_blur_helium_acc_cccn888_t *)ptScratchMemory->pBuffer;
-		ptStatusV = ptStatusH + ptTargetRegionOnVirtualScreen->tSize.iWidth;
-	}
+    __arm_2d_iir_blur_helium_acc_cccn888_t *ptStatusH = NULL;
+    __arm_2d_iir_blur_helium_acc_cccn888_t *ptStatusV = NULL;
+    if (NULL != (void *)ptScratchMemory->pBuffer)
+    {
+        ptStatusH = (__arm_2d_iir_blur_helium_acc_cccn888_t *)ptScratchMemory->pBuffer;
+        ptStatusV = ptStatusH + ptTargetRegionOnVirtualScreen->tSize.iWidth;
+    }
 
-	/* calculate the offset between the target region and the valid region */
-	arm_2d_location_t tOffset = {
-		.iX = ptValidRegionOnVirtualScreen->tLocation.iX - ptTargetRegionOnVirtualScreen->tLocation.iX,
-		.iY = ptValidRegionOnVirtualScreen->tLocation.iY - ptTargetRegionOnVirtualScreen->tLocation.iY,
-	};
-	
-	#if 1
-	uint32x4_t v_offset;
-	v_offset[0] = 0;
-	v_offset[1] = iTargetStride<<2;
-	v_offset[2] = (iTargetStride<<3);
-	v_offset[3] = (iTargetStride<<3) +(iTargetStride<<2);
-	ptStatusV += tOffset.iY;
-	for(int y = 0; y < (iHeight - (iHeight&3)-1); y+=4)
-	{
-		
-		if (NULL != ptStatusV && tOffset.iX > 0)
-		{
-			v_previous_init = vld1q((uint32_t*)&ptStatusV->hwR);
-			v_previous  = vreinterpretq_u8(v_previous_init);
-		}
-		else
-		{
-			v_previous_init = vldrwq_gather_offset((&pwTarget[y*iTargetStride]), v_offset);
-			v_previous  = vreinterpretq_u8(v_previous_init);
-			v_previous = vshrq(v_previous, 1);
-		}
+    /* calculate the offset between the target region and the valid region */
+    arm_2d_location_t tOffset = {
+        .iX = ptValidRegionOnVirtualScreen->tLocation.iX - ptTargetRegionOnVirtualScreen->tLocation.iX,
+        .iY = ptValidRegionOnVirtualScreen->tLocation.iY - ptTargetRegionOnVirtualScreen->tLocation.iY,
+    };
 
-		for(int x = 0; x < iWidth; x++)
-		{
-			v_previous_init = vldrwq_gather_offset(&pwTarget[y*iTargetStride+x], v_offset);
-			v_data = vreinterpretq_u8(v_previous_init);
-			v_data = vshrq(v_data, 1);
-			v_sub = vsubq(v_data, v_previous);
-			v_sub = vqdmulhq(v_sub, v_ratio);
-			v_previous = vaddq((int8x16_t)v_previous, v_sub);
-			v_sub = vshlq_n(v_previous, 1);
-			v_previous_init = vreinterpretq_u32(v_sub);
-			vstrwq_scatter_offset_u32(&pwTarget[y*iTargetStride + x], v_offset, v_previous_init);
-		}
-		if (NULL != ptStatusV)
-		{
-			v_previous_init = vreinterpretq_u32(v_previous);
-			vst1q((uint32_t*)&ptStatusV->hwR, v_previous_init);
-			ptStatusV+=4;
-		}
-	}
+    #if 1
+    uint32x4_t v_offset;
+    v_offset[0] = 0;
+    v_offset[1] = iTargetStride<<2;
+    v_offset[2] = (iTargetStride<<3);
+    v_offset[3] = (iTargetStride<<3) +(iTargetStride<<2);
+    ptStatusV += tOffset.iY;
+    for(int y = 0; y < (iHeight - (iHeight&3)-1); y+=4)
+    {
+        
+        if (NULL != ptStatusV && tOffset.iX > 0)
+        {
+            v_previous_init = vld1q((uint32_t*)&ptStatusV->hwR);
+            v_previous  = vreinterpretq_u8(v_previous_init);
+        }
+        else
+        {
+            v_previous_init = vldrwq_gather_offset((&pwTarget[y*iTargetStride]), v_offset);
+            v_previous  = vreinterpretq_u8(v_previous_init);
+            v_previous = vshrq(v_previous, 1);
+        }
 
-	if((iHeight&3) !=0)
-	{
-		
-		int y = iHeight - (iHeight&3);
-		mve_pred16_t v_pred = vctp8q(((iHeight&3)-1));
-		
-		ptStatusV += tOffset.iY;
-		if (NULL != ptStatusV && tOffset.iX > 0)
-		{
-			v_previous_init = vldrwq_gather_offset_z((uint32_t*)&ptStatusV->hwR, v_offset, v_pred);
-			v_previous  = vreinterpretq_u8(v_previous_init);
-		}
-		else
-		{
-			v_previous_init = vldrwq_gather_offset_z(&pwTarget[y*iTargetStride], v_offset, v_pred);
-			v_previous  = vreinterpretq_u8(v_previous_init);
-			v_previous = vshrq(v_previous, 1);
-		}
-		
-		for(int x = 1; x < iWidth; x++)
-		{
-			v_previous_init = vldrwq_gather_offset_z(&pwTarget[y*iTargetStride+x], v_offset, v_pred);
-			v_data = vreinterpretq_u8(v_previous_init);
-			v_data = vshrq(v_data, 1);
-			v_sub = vsubq(v_data, v_previous);
-			v_sub = vqdmulhq(v_sub, v_ratio);
-			v_previous = vaddq((int8x16_t)v_previous, v_sub);
-			v_sub = vshlq_n(v_previous, 1);
-			v_previous_init = vreinterpretq_u32(v_sub);
-			vstrwq_scatter_offset_p(&pwTarget[y*iTargetStride + x], v_offset, v_previous_init, v_pred);
-		}
-		if (NULL != ptStatusV)
-		{
-			v_previous_init = vreinterpretq_u32(v_previous);
-			vst1q_p((uint32_t*)&ptStatusV->hwR, v_previous_init, v_pred);
-			ptStatusV+=(iHeight&3);
-		}
-	}
-	#endif
-	//column x4
-	#if 1
-	ptStatusH += tOffset.iX;
-	for(int x = 0; x < iWidth - (iWidth&3)-1; x+=4)
-	{
-		
-		if (NULL != ptStatusH && tOffset.iY > 0)
-		{
-			v_previous = vld1q(&ptStatusH->hwR);
-		}
-		else
-		{
-			v_previous_init = vld1q(&pwTarget[x]);
-			v_previous  = vreinterpretq_u8(v_previous_init);
-			v_previous = vshrq(v_previous, 1);
-		}
-		
-		for(int y = 0; y < iHeight; y++)
-		{
-			v_previous_init = vld1q(&pwTarget[y*iTargetStride+x]);
-			v_data = vreinterpretq_u8(v_previous_init);
-			v_data = vshrq(v_data, 1);
-			v_sub = vsubq(v_data, v_previous);
-			v_sub = vqdmulhq(v_sub, v_ratio);
-			v_previous = vaddq((int8x16_t)v_previous, v_sub);
-			v_sub = vshlq_n(v_previous, 1);
-			vst1q((int8_t*)&pwTarget[y*iTargetStride + x], v_sub);
-		}
-		if (NULL != ptStatusH)
-		{
-			vst1q(&ptStatusH->hwR, v_previous);
-			ptStatusH+=4;
-		}
-	}
-	
-	if((iWidth&3)!=0)
-	{
-		int x = iWidth - (iWidth&3);
-		mve_pred16_t v_pred = vctp32q(((iWidth&3)));
-		
-		ptStatusH += tOffset.iX;
-		if (NULL != ptStatusH && tOffset.iY > 0)
-		{
-			v_previous_init = vld1q_z((uint32_t*)&ptStatusH->hwR, v_pred);
-			v_previous  = vreinterpretq_u8(v_previous_init);
-		}
-		else
-		{
-			v_previous_init = vld1q_z(&pwTarget[x], v_pred);
-			v_previous  = vreinterpretq_u8(v_previous_init);
-			v_previous = vshrq(v_previous, 1);
-		}
-		
-		for(int y = 0; y < iHeight; y++)
-		{
-			v_previous_init = vld1q_z(&pwTarget[y*iTargetStride+x], v_pred);
-			v_data = vreinterpretq_u8(v_previous_init);
-			v_data = vshrq(v_data, 1);
-			v_sub = vsubq(v_data, v_previous);
-			vqdmulhq(v_sub, v_ratio);
-			v_previous = vaddq((int8x16_t)v_previous, v_sub);
-			v_sub = vshlq_n(v_previous, 1);
-			v_previous_init = vreinterpretq_u32(v_sub);
-			vst1q_p((int8_t*)&pwTarget[y*iTargetStride + x], v_sub, v_pred);
-		}
-		if (NULL != ptStatusH)
-		{
-			v_previous_init = vreinterpretq_u32(v_previous);
-			vst1q_p((uint32_t*)&ptStatusH->hwR, v_previous_init, v_pred);
-			ptStatusH+=iWidth&3;
-		}
-	}
-	#endif
+        for(int x = 0; x < iWidth; x++)
+        {
+            v_previous_init = vldrwq_gather_offset(&pwTarget[y*iTargetStride+x], v_offset);
+            v_data = vreinterpretq_u8(v_previous_init);
+            v_data = vshrq(v_data, 1);
+            v_sub = vsubq(v_data, v_previous);
+            v_sub = vqdmulhq(v_sub, v_ratio);
+            v_previous = vaddq((int8x16_t)v_previous, v_sub);
+            v_sub = vshlq_n(v_previous, 1);
+            v_previous_init = vreinterpretq_u32(v_sub);
+            vstrwq_scatter_offset_u32(&pwTarget[y*iTargetStride + x], v_offset, v_previous_init);
+        }
+        if (NULL != ptStatusV)
+        {
+            v_previous_init = vreinterpretq_u32(v_previous);
+            vst1q((uint32_t*)&ptStatusV->hwR, v_previous_init);
+            ptStatusV+=4;
+        }
+    }
+
+    if((iHeight&3) !=0)
+    {
+        
+        int y = iHeight - (iHeight&3);
+        mve_pred16_t v_pred = vctp8q(((iHeight&3)-1));
+        
+        ptStatusV += tOffset.iY;
+        if (NULL != ptStatusV && tOffset.iX > 0)
+        {
+            v_previous_init = vldrwq_gather_offset_z((uint32_t*)&ptStatusV->hwR, v_offset, v_pred);
+            v_previous  = vreinterpretq_u8(v_previous_init);
+        }
+        else
+        {
+            v_previous_init = vldrwq_gather_offset_z(&pwTarget[y*iTargetStride], v_offset, v_pred);
+            v_previous  = vreinterpretq_u8(v_previous_init);
+            v_previous = vshrq(v_previous, 1);
+        }
+        
+        for(int x = 1; x < iWidth; x++)
+        {
+            v_previous_init = vldrwq_gather_offset_z(&pwTarget[y*iTargetStride+x], v_offset, v_pred);
+            v_data = vreinterpretq_u8(v_previous_init);
+            v_data = vshrq(v_data, 1);
+            v_sub = vsubq(v_data, v_previous);
+            v_sub = vqdmulhq(v_sub, v_ratio);
+            v_previous = vaddq((int8x16_t)v_previous, v_sub);
+            v_sub = vshlq_n(v_previous, 1);
+            v_previous_init = vreinterpretq_u32(v_sub);
+            vstrwq_scatter_offset_p(&pwTarget[y*iTargetStride + x], v_offset, v_previous_init, v_pred);
+        }
+        if (NULL != ptStatusV)
+        {
+            v_previous_init = vreinterpretq_u32(v_previous);
+            vst1q_p((uint32_t*)&ptStatusV->hwR, v_previous_init, v_pred);
+            ptStatusV+=(iHeight&3);
+        }
+    }
+    #endif
+    //column x4
+    #if 1
+    ptStatusH += tOffset.iX;
+    for(int x = 0; x < iWidth - (iWidth&3)-1; x+=4)
+    {
+        
+        if (NULL != ptStatusH && tOffset.iY > 0)
+        {
+            v_previous = vld1q(&ptStatusH->hwR);
+        }
+        else
+        {
+            v_previous_init = vld1q(&pwTarget[x]);
+            v_previous  = vreinterpretq_u8(v_previous_init);
+            v_previous = vshrq(v_previous, 1);
+        }
+        
+        for(int y = 0; y < iHeight; y++)
+        {
+            v_previous_init = vld1q(&pwTarget[y*iTargetStride+x]);
+            v_data = vreinterpretq_u8(v_previous_init);
+            v_data = vshrq(v_data, 1);
+            v_sub = vsubq(v_data, v_previous);
+            v_sub = vqdmulhq(v_sub, v_ratio);
+            v_previous = vaddq((int8x16_t)v_previous, v_sub);
+            v_sub = vshlq_n(v_previous, 1);
+            vst1q((int8_t*)&pwTarget[y*iTargetStride + x], v_sub);
+        }
+        if (NULL != ptStatusH)
+        {
+            vst1q(&ptStatusH->hwR, v_previous);
+            ptStatusH+=4;
+        }
+    }
+
+    if((iWidth&3)!=0)
+    {
+        int x = iWidth - (iWidth&3);
+        mve_pred16_t v_pred = vctp32q(((iWidth&3)));
+        
+        ptStatusH += tOffset.iX;
+        if (NULL != ptStatusH && tOffset.iY > 0)
+        {
+            v_previous_init = vld1q_z((uint32_t*)&ptStatusH->hwR, v_pred);
+            v_previous  = vreinterpretq_u8(v_previous_init);
+        }
+        else
+        {
+            v_previous_init = vld1q_z(&pwTarget[x], v_pred);
+            v_previous  = vreinterpretq_u8(v_previous_init);
+            v_previous = vshrq(v_previous, 1);
+        }
+        
+        for(int y = 0; y < iHeight; y++)
+        {
+            v_previous_init = vld1q_z(&pwTarget[y*iTargetStride+x], v_pred);
+            v_data = vreinterpretq_u8(v_previous_init);
+            v_data = vshrq(v_data, 1);
+            v_sub = vsubq(v_data, v_previous);
+            vqdmulhq(v_sub, v_ratio);
+            v_previous = vaddq((int8x16_t)v_previous, v_sub);
+            v_sub = vshlq_n(v_previous, 1);
+            v_previous_init = vreinterpretq_u32(v_sub);
+            vst1q_p((int8_t*)&pwTarget[y*iTargetStride + x], v_sub, v_pred);
+        }
+        if (NULL != ptStatusH)
+        {
+            v_previous_init = vreinterpretq_u32(v_previous);
+            vst1q_p((uint32_t*)&ptStatusH->hwR, v_previous_init, v_pred);
+            ptStatusH+=iWidth&3;
+        }
+    }
+    #endif
 }
 #endif
 #ifdef   __cplusplus

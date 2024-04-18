@@ -169,7 +169,7 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
     do {
         int32_t nResult;
         arm_2d_helper_time_cos_slider(128, 255-16, 10000, 0, &nResult, &this.lTimestamp[1]);
-        this.chBlurDegree = nResult;
+        this.chBlurDegree = 255 - 16;//nResult;
     } while(0);
 
 #if 0
