@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>SSE-300-MPS3</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.V2M_MPS3_SSE_300_BSP.1.5.0</PackID>
+          <PackID>ARM.V2M_MPS3_SSE_300_BSP.1.4.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x00000000,0x00080000) IRAM2(0x01000000,0x00200000) XRAM(0x20000000,0x00020000) XRAM2(0x20020000,0x00020000) XRAM3(0x20040000,0x00020000) CPUTYPE("Cortex-M55") FPU3(DFPU) DSP TZ MVE(FP) CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -642,7 +642,7 @@
         <TargetCommonOption>
           <Device>SSE-300-MPS3</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.V2M_MPS3_SSE_300_BSP.1.5.0</PackID>
+          <PackID>ARM.V2M_MPS3_SSE_300_BSP.1.4.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x00000000,0x00080000) IRAM2(0x01000000,0x00200000) XRAM(0x20000000,0x00020000) XRAM2(0x20020000,0x00020000) XRAM3(0x20040000,0x00020000) CPUTYPE("Cortex-M55") FPU3(DFPU) DSP TZ MVE(FP) CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -940,7 +940,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>0</Optim>
+            <Optim>5</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -963,8 +963,8 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Omax</MiscControls>
-              <Define>USE_EVR_FOR_STDOUR,LV_USE_DEV_VERSION</Define>
+              <MiscControls></MiscControls>
+              <Define>USE_EVR_FOR_STDOUR</Define>
               <Undefine></Undefine>
               <IncludePath>.\platform;.;.\ui</IncludePath>
             </VariousControls>
@@ -1263,7 +1263,7 @@
   <RTE>
     <apis>
       <api Capiversion="2.4.0" Cclass="CMSIS Driver" Cgroup="USART" exclusive="0">
-        <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
+        <package name="CMSIS" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="ARM" version="6.0.0"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1278,7 +1278,7 @@
       </api>
     </apis>
     <components>
-      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="PFB" Cvendor="ARM" Cversion="1.10.8" condition="Arm-2D-CORE">
+      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="PFB" Cvendor="ARM" Cversion="1.11.5" condition="Arm-2D-CORE">
         <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
@@ -1307,7 +1307,7 @@
         </targetInfos>
       </component>
       <component Capiversion="2.2.0" Cclass="CMSIS Driver" Cgroup="USART" Cvendor="ARM" Cversion="1.0.0" condition="SSE-300-MPS3 USART">
-        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.3.0"/>
+        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1349,7 +1349,14 @@
         </targetInfos>
       </component>
       <component Cclass="Device" Cgroup="Definition" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device">
-        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.7.28" url="http://www.keil.com/pack/" vendor="ARM" version="1.5.0"/>
+        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_MPS3"/>
+        </targetInfos>
+      </component>
+      <component Cclass="Device" Cgroup="Native Driver" Csub="SPI" Cvendor="ARM" Cversion="1.1.0" condition="SSE-300-MPS3 Device">
+        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1404,6 +1411,13 @@
           <targetInfo name="Cortex-M55_MPS3"/>
         </targetInfos>
       </component>
+      <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Demos" Csub="Benchmark" Cvendor="LVGL" Cversion="9.1.0" condition="Demo-Benchmark">
+        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.1-dev2"/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_MPS3"/>
+        </targetInfos>
+      </component>
       <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Demos" Csub="Widgets" Cvendor="LVGL" Cversion="9.1.0" condition="LVGL-Essential-Assets">
         <package name="lvgl" schemaVersion="1.7.28" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.0"/>
         <targetInfos>
@@ -1412,7 +1426,7 @@
         </targetInfos>
       </component>
       <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Essential" Cvendor="LVGL" Cversion="9.1.0">
-        <package name="lvgl" schemaVersion="1.7.28" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.0"/>
+        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.1-dev2"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1443,7 +1457,7 @@
           <targetInfo name="Cortex-M55_MPS3"/>
         </targetInfos>
       </file>
-      <file attr="config" category="sourceC" name="Library\Source\arm_2d.c" version="1.3.3">
+      <file attr="config" category="sourceC" name="Library\Source\arm_2d.c" version="1.3.1">
         <instance index="0">RTE\Acceleration\arm_2d.c</instance>
         <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.6" condition="CMSIS-DSP"/>
         <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
@@ -1452,7 +1466,7 @@
           <targetInfo name="Cortex-M55_MPS3"/>
         </targetInfos>
       </file>
-      <file attr="config" category="preIncludeGlobal" name="Library\Include\template\arm_2d_cfg.h" version="1.3.3">
+      <file attr="config" category="preIncludeGlobal" name="Library\Include\template\arm_2d_cfg.h" version="1.3.2">
         <instance index="0">RTE\Acceleration\arm_2d_cfg.h</instance>
         <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.6" condition="CMSIS-DSP"/>
         <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
@@ -1495,21 +1509,27 @@
         <targetInfos/>
       </file>
       <file attr="config" category="header" name="CMSIS_Driver\Config\RTE_Device.h" version="1.1.0">
-        <instance index="0" removed="1">RTE\Device\SSE-300-MPS3\RTE_Device.h</instance>
+        <instance index="0">RTE\Device\SSE-300-MPS3\RTE_Device.h</instance>
         <component Cclass="Device" Cgroup="Definition" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device"/>
         <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
-        <targetInfos/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_MPS3"/>
+        </targetInfos>
       </file>
       <file attr="config" category="header" name="CMSIS_Driver\Config\cmsis_driver_config.h" version="1.1.1">
-        <instance index="0" removed="1">RTE\Device\SSE-300-MPS3\cmsis_driver_config.h</instance>
+        <instance index="0">RTE\Device\SSE-300-MPS3\cmsis_driver_config.h</instance>
         <component Cclass="Device" Cgroup="Definition" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device"/>
         <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
-        <targetInfos/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_MPS3"/>
+        </targetInfos>
       </file>
-      <file attr="config" category="header" name="Device\Config\device_cfg.h" version="1.1.4">
+      <file attr="config" category="header" name="Device\Config\device_cfg.h" version="1.1.3">
         <instance index="0">RTE\Device\SSE-300-MPS3\device_cfg.h</instance>
         <component Cclass="Device" Cgroup="Definition" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device"/>
-        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.7.28" url="http://www.keil.com/pack/" vendor="ARM" version="1.5.0"/>
+        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1522,10 +1542,13 @@
         <targetInfos/>
       </file>
       <file attr="config" category="linkerScript" condition="ARMCC6" name="Device\Source\armclang\linker_SSE300MPS3_secure.sct" version="1.1.0">
-        <instance index="0" removed="1">RTE\Device\SSE-300-MPS3\linker_SSE300MPS3_secure.sct</instance>
+        <instance index="0">RTE\Device\SSE-300-MPS3\linker_SSE300MPS3_secure.sct</instance>
         <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device"/>
         <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
-        <targetInfos/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_MPS3"/>
+        </targetInfos>
       </file>
       <file attr="config" category="header" name="Board\Platform\platform_base_address.h" version="1.1.2">
         <instance index="0" removed="1">RTE\Device\SSE-300-MPS3\platform_base_address.h</instance>
@@ -1534,21 +1557,27 @@
         <targetInfos/>
       </file>
       <file attr="config" category="header" name="Device\Include\region_defs.h" version="1.0.0">
-        <instance index="0" removed="1">RTE\Device\SSE-300-MPS3\region_defs.h</instance>
+        <instance index="0">RTE\Device\SSE-300-MPS3\region_defs.h</instance>
         <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device"/>
         <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
-        <targetInfos/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_MPS3"/>
+        </targetInfos>
       </file>
       <file attr="config" category="header" name="Device\Include\region_limits.h" version="1.0.0">
-        <instance index="0" removed="1">RTE\Device\SSE-300-MPS3\region_limits.h</instance>
+        <instance index="0">RTE\Device\SSE-300-MPS3\region_limits.h</instance>
         <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device"/>
         <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
-        <targetInfos/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_MPS3"/>
+        </targetInfos>
       </file>
       <file attr="config" category="source" name="Device\Source\startup_SSE300MPS3.c" version="1.1.1">
         <instance index="0">RTE\Device\SSE-300-MPS3\startup_SSE300MPS3.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device"/>
-        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.7.28" url="http://www.keil.com/pack/" vendor="ARM" version="1.5.0"/>
+        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1563,7 +1592,7 @@
       <file attr="config" category="source" name="Device\Source\system_SSE300MPS3.c" version="1.1.1">
         <instance index="0">RTE\Device\SSE-300-MPS3\system_SSE300MPS3.c</instance>
         <component Cclass="Device" Cgroup="Startup" Cvariant="C Startup" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device"/>
-        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.7.28" url="http://www.keil.com/pack/" vendor="ARM" version="1.5.0"/>
+        <package name="V2M_MPS3_SSE_300_BSP" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="1.4.0"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1587,10 +1616,10 @@
         <package name="lvgl" schemaVersion="1.4" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="1.1.1-alpha"/>
         <targetInfos/>
       </file>
-      <file attr="config" category="preIncludeGlobal" name="lv_conf_cmsis.h" version="2.1.5">
+      <file attr="config" category="preIncludeGlobal" name="lv_conf_cmsis.h" version="2.1.6">
         <instance index="0">RTE\LVGL\lv_conf_cmsis.h</instance>
         <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Essential" Cvendor="LVGL" Cversion="9.1.0"/>
-        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.0"/>
+        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.1-dev2"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1599,7 +1628,7 @@
       <file attr="config" category="sourceC" name="examples\porting\lv_port_disp_template.c" version="1.0.1">
         <instance index="0">RTE\LVGL\lv_port_disp_template.c</instance>
         <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Porting" Csub="Display" Cvariant="Generic" Cvendor="LVGL" Cversion="9.1.0" condition="LVGL-Essential" isDefaultVariant="1"/>
-        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.0"/>
+        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.1-dev2"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1608,7 +1637,7 @@
       <file attr="config" category="header" name="examples\porting\lv_port_disp_template.h" version="1.0.1">
         <instance index="0">RTE\LVGL\lv_port_disp_template.h</instance>
         <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Porting" Csub="Display" Cvariant="Generic" Cvendor="LVGL" Cversion="9.1.0" condition="LVGL-Essential" isDefaultVariant="1"/>
-        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.0"/>
+        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.1-dev2"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1629,7 +1658,7 @@
       <file attr="config" category="sourceC" name="examples\porting\lv_port_indev_template.c" version="1.0.0">
         <instance index="0">RTE\LVGL\lv_port_indev_template.c</instance>
         <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Porting" Csub="Input" Cvariant="Generic" Cvendor="LVGL" Cversion="9.1.0" condition="LVGL-Essential" isDefaultVariant="1"/>
-        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.0"/>
+        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.1-dev2"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
@@ -1638,7 +1667,7 @@
       <file attr="config" category="header" name="examples\porting\lv_port_indev_template.h" version="1.0.0">
         <instance index="0">RTE\LVGL\lv_port_indev_template.h</instance>
         <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Porting" Csub="Input" Cvariant="Generic" Cvendor="LVGL" Cversion="9.1.0" condition="LVGL-Essential" isDefaultVariant="1"/>
-        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.0"/>
+        <package name="lvgl" schemaVersion="1.7.31" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.1.1-dev2"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
           <targetInfo name="Cortex-M55_MPS3"/>
