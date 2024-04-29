@@ -84,7 +84,7 @@ int main(void)
     
     //lv_demo_benchmark_run_scene(LV_DEMO_BENCHMARK_MODE_RENDER_AND_DRIVER, 26*2-1);      // run scene no 31
 #elif LV_USE_DEMO_RENDER
-    lv_demo_render(LV_DEMO_RENDER_SCENE_IMAGE_NORMAL, 128);
+    lv_demo_render(LV_DEMO_RENDER_SCENE_IMAGE_NORMAL_1, 128);
 #elif LV_USE_DEMO_WIDGETS
     lv_demo_widgets();
 #elif LV_USE_DEMO_MUSIC
