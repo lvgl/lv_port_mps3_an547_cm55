@@ -100,6 +100,20 @@ extern const arm_2d_tile_t c_tileWhiteDotMask;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static void __on_scene_atom_load(arm_2d_scene_t *ptScene)
+{
+    user_scene_atom_t *ptThis = (user_scene_atom_t *)ptScene;
+    ARM_2D_UNUSED(ptThis);
+
+    arm_2d_helper_dirty_region_add_items(&this.use_as__arm_2d_scene_t.tDirtyRegionHelper,
+                                         &this.Electronic[0].tDirtyRegionItem,
+                                         1);
+
+    arm_2d_helper_dirty_region_add_items(&this.use_as__arm_2d_scene_t.tDirtyRegionHelper,
+                                         &this.Electronic[1].tDirtyRegionItem,
+                                         1);
+
+}
 
 static void __on_scene_atom_depose(arm_2d_scene_t *ptScene)
 {
@@ -111,10 +125,6 @@ static void __on_scene_atom_depose(arm_2d_scene_t *ptScene)
     arm_foreach(int64_t,this.lTimestamp, ptItem) {
         *ptItem = 0;
     }
-
-    arm_2d_helper_dirty_region_depose(&this.Core.tDirtyRegionHelper);
-    arm_2d_helper_dirty_region_depose(&this.Electronic[0].tDirtyRegionHelper);
-    arm_2d_helper_dirty_region_depose(&this.Electronic[1].tDirtyRegionHelper);
 
     if (!this.bUserAllocated) {
         __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
@@ -181,11 +191,6 @@ static void __on_scene_atom_frame_start(arm_2d_scene_t *ptScene)
 
     } while(0);
 
-
-    arm_2d_helper_dirty_region_on_frame_begin(&this.Core.tDirtyRegionHelper);
-
-    arm_2d_helper_dirty_region_on_frame_begin(&this.Electronic[0].tDirtyRegionHelper);
-    arm_2d_helper_dirty_region_on_frame_begin(&this.Electronic[1].tDirtyRegionHelper);
 }
 
 static void __on_scene_atom_frame_complete(arm_2d_scene_t *ptScene)
@@ -233,7 +238,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_atom_handler)
         /* draw atom core */
         arm_2d_align_centre(__top_canvas, tAtomCoreSize) {
 
-            arm_2d_layout(__centre_region) {
+            arm_2d_layout(__centre_region, true) {
             
                 __item_line_dock_vertical(c_tileWhiteDotMiddleA4Mask.tRegion.tSize.iHeight * 2) {
                     
@@ -245,11 +250,11 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_atom_handler)
                     tDirtyRegion.tSize.iHeight += tCharSize.iHeight;
 
                     /* update dirty region */
-                    arm_2d_helper_dirty_region_update_dirty_regions(&this.Core.tDirtyRegionHelper,
-                                                                    (arm_2d_tile_t *)ptTile,
-                                                                    &__top_canvas,
-                                                                    &tDirtyRegion,
-                                                                    bIsNewFrame);
+                    arm_2d_helper_dirty_region_update_item(&this.use_as__arm_2d_scene_t.tDirtyRegionHelper,
+                                                           &this.use_as__arm_2d_scene_t.tDirtyRegionHelper.tDefaultItem,
+                                                            (arm_2d_tile_t *)ptTile,
+                                                            &__top_canvas,
+                                                            &tDirtyRegion);
 
                     do {
                         arm_2d_region_t tHadron = __item_region;
@@ -318,7 +323,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_atom_handler)
 
                     arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
                     arm_lcd_text_set_colour(GLCD_COLOR_RED, GLCD_COLOR_WHITE);
-                    arm_print_banner("+2", __item_region, &ARM_2D_FONT_A4_DIGITS_ONLY);
+                    arm_print_banner("2+", __item_region, &ARM_2D_FONT_A4_DIGITS_ONLY);
                 }
             }
         }
@@ -341,13 +346,13 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_atom_handler)
 
                     __centre_region.tLocation.iX += this.Electronic[0].tOffset.iX;
                     __centre_region.tLocation.iY += this.Electronic[0].tOffset.iY;
-
+              
                     /* update dirty region */
-                    arm_2d_helper_dirty_region_update_dirty_regions(&this.Electronic[0].tDirtyRegionHelper,
-                                                                    (arm_2d_tile_t *)ptTile,
-                                                                    &__top_canvas,
-                                                                    &__centre_region,
-                                                                    bIsNewFrame);
+                    arm_2d_helper_dirty_region_update_item( &this.use_as__arm_2d_scene_t.tDirtyRegionHelper,
+                                                            &this.Electronic[0].tDirtyRegionItem,
+                                                            (arm_2d_tile_t *)ptTile,
+                                                            &__top_canvas,
+                                                            &__centre_region);
 
                     arm_2d_align_bottom_left(__centre_region, c_tileWhiteDotMask.tRegion.tSize) {
 
@@ -359,17 +364,13 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_atom_handler)
                             this.Electronic[0].chOpacity);
 
                         ARM_2D_OP_WAIT_ASYNC();
-                        
                     }
 
                     arm_2d_align_mid_right(__centre_region, tCharSize) {
-
                         arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
                         arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
                         arm_print_banner("-", __mid_right_region, &ARM_2D_FONT_A4_DIGITS_ONLY);
-                        
                     }
-                    
                 }
                 
                 /* electronic 1 */
@@ -379,11 +380,11 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_atom_handler)
                     __centre_region.tLocation.iY += this.Electronic[1].tOffset.iY;
 
                     /* update dirty region */
-                    arm_2d_helper_dirty_region_update_dirty_regions(&this.Electronic[1].tDirtyRegionHelper,
-                                                                    (arm_2d_tile_t *)ptTile,
-                                                                    &__top_canvas,
-                                                                    &__centre_region,
-                                                                    bIsNewFrame);
+                    arm_2d_helper_dirty_region_update_item( &this.use_as__arm_2d_scene_t.tDirtyRegionHelper,
+                                                            &this.Electronic[1].tDirtyRegionItem,
+                                                            (arm_2d_tile_t *)ptTile,
+                                                            &__top_canvas,
+                                                            &__centre_region);
 
                     arm_2d_align_bottom_left(__centre_region, c_tileWhiteDotMask.tRegion.tSize) {
 
@@ -415,7 +416,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_atom_handler)
         arm_lcd_text_set_draw_region(NULL);
         arm_lcd_text_set_colour(GLCD_COLOR_RED, GLCD_COLOR_WHITE);
         arm_lcd_text_location(0,0);
-        arm_lcd_puts("Scene atom");
+        arm_lcd_puts("Scene Atom");
 
     /*-----------------------draw the foreground end  -----------------------*/
     }
@@ -454,6 +455,7 @@ user_scene_atom_t *__arm_2d_scene_atom_init(   arm_2d_scene_player_t *ptDispAdap
 
             /* Please uncommon the callbacks if you need them
              */
+            .fnOnLoad       = &__on_scene_atom_load,
             .fnScene        = &__pfb_draw_scene_atom_handler,
 
             //.fnOnBGStart    = &__on_scene_atom_background_start,
@@ -462,18 +464,13 @@ user_scene_atom_t *__arm_2d_scene_atom_init(   arm_2d_scene_player_t *ptDispAdap
             //.fnBeforeSwitchOut = &__before_scene_atom_switching_out,
             .fnOnFrameCPL   = &__on_scene_atom_frame_complete,
             .fnDepose       = &__on_scene_atom_depose,
+
+            .bUseDirtyRegionHelper = true,
         },
         .bUserAllocated = bUserAllocated,
     };
 
     /* ------------   initialize members of user_scene_atom_t begin ---------------*/
-    arm_2d_helper_dirty_region_init(&this.Core.tDirtyRegionHelper,
-                                    &this.use_as__arm_2d_scene_t.ptDirtyRegion);
-    
-    arm_2d_helper_dirty_region_init(&this.Electronic[0].tDirtyRegionHelper,
-                                    &this.use_as__arm_2d_scene_t.ptDirtyRegion);
-    arm_2d_helper_dirty_region_init(&this.Electronic[1].tDirtyRegionHelper,
-                                    &this.use_as__arm_2d_scene_t.ptDirtyRegion);
 
     /* ------------   initialize members of user_scene_atom_t end   ---------------*/
 

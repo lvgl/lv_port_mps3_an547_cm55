@@ -87,12 +87,11 @@ ARM_PRIVATE(
     bool bUserAllocated;
 
     struct {
-        arm_2d_helper_dirty_region_t tDirtyRegionHelper;
         arm_2d_location_t tVibration;
     } Core;
 
     struct {
-        arm_2d_helper_dirty_region_t tDirtyRegionHelper;
+        arm_2d_helper_dirty_region_item_t tDirtyRegionItem;
         arm_2d_location_t tOffset;
         uint8_t chOpacity;
     } Electronic[2];
