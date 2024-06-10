@@ -50,21 +50,21 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your screen
 #ifndef __DISP0_CFG_COLOUR_DEPTH__
-#   define __DISP0_CFG_COLOUR_DEPTH__                              32
+#   define __DISP0_CFG_COLOUR_DEPTH__                              16
 #endif
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
 // <i> Default: 320
 #ifndef __DISP0_CFG_SCEEN_WIDTH__
-#   define __DISP0_CFG_SCEEN_WIDTH__                               320
+#   define __DISP0_CFG_SCEEN_WIDTH__                               480
 #endif
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
 // <i> Default: 240
 #ifndef __DISP0_CFG_SCEEN_HEIGHT__
-#   define __DISP0_CFG_SCEEN_HEIGHT__                              240
+#   define __DISP0_CFG_SCEEN_HEIGHT__                              360
 #endif
 
 /*
@@ -94,7 +94,7 @@ extern "C" {
 // <o>Height of the PFB block
 // <i> The height of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_HEIGHT__
-#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          240
+#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          36
 #endif
 
 // <o>Width Alignment of generated PFBs
@@ -108,7 +108,7 @@ extern "C" {
 //     <7=>   128 pixel
 // <i> Make sure the x and width of the PFB is always aligned to 2^n pixels
 #ifndef __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__
-#   define __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__                     0
+#   define __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__                     1
 #endif
 
 // <o>Height Alignment of generated PFBs
@@ -184,7 +184,7 @@ extern "C" {
 // <q>Disable the default scene
 // <i> Remove the default scene for this display adapter. We highly recommend you to disable the default scene when creating real applications.
 #ifndef __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-#   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                     1
+#   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                     0
 #endif
 
 // <q>Disable the navigation layer

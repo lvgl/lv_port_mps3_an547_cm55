@@ -110,7 +110,10 @@ int main(void)
     
 //arm_2d_scene_atom_init(&DISP0_ADAPTER);
     arm_2d_scene0_init(&DISP0_ADAPTER);
-    //arm_2d_scene_alarm_clock_init(&DISP0_ADAPTER);
+    arm_2d_scene_player_set_switching_mode(&DISP0_ADAPTER,
+                                           ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE);
+    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
+    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
 
     while(1) {
         disp_adapter0_task();
