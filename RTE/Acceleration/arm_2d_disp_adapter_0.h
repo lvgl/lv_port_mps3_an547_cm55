@@ -57,14 +57,14 @@ extern "C" {
 // <i> The width of your screen
 // <i> Default: 320
 #ifndef __DISP0_CFG_SCEEN_WIDTH__
-#   define __DISP0_CFG_SCEEN_WIDTH__                               480
+#   define __DISP0_CFG_SCEEN_WIDTH__                               320
 #endif
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
 // <i> Default: 240
 #ifndef __DISP0_CFG_SCEEN_HEIGHT__
-#   define __DISP0_CFG_SCEEN_HEIGHT__                              360
+#   define __DISP0_CFG_SCEEN_HEIGHT__                              240
 #endif
 
 /*
@@ -94,7 +94,7 @@ extern "C" {
 // <o>Height of the PFB block
 // <i> The height of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_HEIGHT__
-#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          36
+#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          24
 #endif
 
 // <o>Width Alignment of generated PFBs
@@ -184,13 +184,17 @@ extern "C" {
 // <q>Disable the default scene
 // <i> Remove the default scene for this display adapter. We highly recommend you to disable the default scene when creating real applications.
 #ifndef __DISP0_CFG_DISABLE_DEFAULT_SCENE__
-#   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                     0
+#   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                     1
 #endif
 
-// <q>Disable the navigation layer
-// <i> Remove the navigation layer for this display adapter. NOTE: Disable the navigation layer will also remove the real-time FPS display.
-#ifndef __DISP0_CFG_DISABLE_NAVIGATION_LAYER__
-#   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  0
+// <o>Navigation Layer Mode
+//     <0=>     Disable Navigation Layer
+//     <1=>     Normal Mode (Bottom)
+//     <2=>     Tiny Mode (Bottom Centre)
+// <i> Configure the default navigation layer of this display adapter. 
+// <i> NOTE: Disable the navigation layer will also remove the real-time FPS display.
+#ifndef __DISP0_CFG_NAVIGATION_LAYER_MODE__
+#   define __DISP0_CFG_NAVIGATION_LAYER_MODE__                              1
 #endif
 
 // <q> Enable Console

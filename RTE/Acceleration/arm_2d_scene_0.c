@@ -178,28 +178,6 @@ static void __on_scene0_frame_start(arm_2d_scene_t *ptScene)
         this.chBlurDegree = 128;
     }
 #endif
-#if 0
-    arm_foreach(arm_2d_filter_iir_blur_descriptor_t,
-                this.tUserOPCODETemplate, 
-                ptOP) {
-        /* get the screen region */
-        arm_2d_size_t tSize 
-            = arm_2d_scene_player_get_screen_size(this.use_as__arm_2d_scene_t.ptPlayer);
-        size_t tMemorySize = (tSize.iHeight + tSize.iWidth) * sizeof(__arm_2d_iir_blur_acc_t);
-
-        ptOP->tScratchMemory.pBuffer 
-            = (uintptr_t)__arm_2d_allocate_scratch_memory( 
-                                                tMemorySize , 
-                                                __alignof__(__arm_2d_iir_blur_acc_t),
-                                                ARM_2D_MEM_TYPE_FAST);
-
-        ptOP->tScratchMemory.u24SizeInByte = tMemorySize;
-        ptOP->tScratchMemory.u2Align = __alignof__(__arm_2d_iir_blur_acc_t);
-        ptOP->tScratchMemory.u2ItemSize = sizeof(__arm_2d_iir_blur_acc_t);
-        ptOP->tScratchMemory.u2Type = ARM_2D_MEM_TYPE_FAST;
-
-    }
-#endif
 }
 
 static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
@@ -217,7 +195,7 @@ static void __on_scene0_frame_complete(arm_2d_scene_t *ptScene)
     arm_foreach(arm_2d_filter_iir_blur_descriptor_t,
                 this.tUserOPCODETemplate, 
                 ptOP) {
-        arm_2d_scratch_memory_free(&ptOP->tScratchMemory);
+        arm_2dp_filter_iir_blur_depose(ptOP);
     }
 }
 
@@ -387,18 +365,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                         arm_2d_tile_copy_only(  &DEMO_IMAGE,
                                                 ptTile,
                                                 &__item_region);
-
-                        if (bIsNewFrame && !__DISP_ADPATER_USE_FULL_FRAMEBUFFER__) {
-                            if (NULL == arm_2d_scratch_memory_new(  
-                                        &this.tUserOPCODETemplate[2].tScratchMemory,
-                                        sizeof(__arm_2d_iir_blur_acc_t),
-                                        (   __item_region.tSize.iHeight 
-                                        +   __item_region.tSize.iWidth),
-                                        __alignof__(__arm_2d_iir_blur_acc_t),
-                                        ARM_2D_MEM_TYPE_FAST)) {
-                                assert(false);  /* insufficient memory */
-                            }
-                        }
 
                         arm_2dp_filter_iir_blur(&this.tUserOPCODETemplate[2],
                                                 ptTile,
