@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2022 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2024 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -25,6 +25,10 @@
 #   include "RTE_Components.h"
 #endif
 
+#if defined(__ARM_2D_USER_APP_CFG_H__)
+#   include __ARM_2D_USER_APP_CFG_H__
+#endif
+
 #ifdef   __cplusplus
 extern "C" {
 #endif
@@ -45,7 +49,10 @@ extern "C" {
 #   define __ARM_2D_HAS_ASYNC__                                     0
 #endif
 
-// <q>Enable anti-alias support for all tranform operations.
+// <o>Enable Anti-Alias support for all transform operations.
+//     <0=>     No Anti-Alias
+//     <1=>     Use 4x Supersampling Anti-Alias (4xSSAA)
+//     <2=>     Use 2x Supersampling Anti-Alias (2xSSAA)
 // <i> Note that enabling this feature suffers a non-negligible performance drop.
 // <i> This feature is disabled by default.
 #ifndef __ARM_2D_HAS_ANTI_ALIAS_TRANSFORM__
@@ -57,6 +64,25 @@ extern "C" {
 // <i> This feature is disabled by default to save code size
 #ifndef __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
 #   define __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__             1
+#endif
+
+// <q>Enable ccca8888(ARGB8888) implicit conversion 
+// <i> This feature is disabled by default to save code size
+#ifndef __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__
+#   define __ARM_2D_CFG_SUPPORT_CCCA8888_IMPLICIT_CONVERSION__      0
+#endif
+
+// <q>Improve the Quality of IIR Blur
+// <i> Note that enabling this feature will half the performance of IIR Blur and only works correctly in Full framebuffer mode
+// <i> This feature is disabled by default to improve performance
+#ifndef __ARM_2D_CFG_USE_IIR_BLUR_REVERSE_PATH__
+#   define __ARM_2D_CFG_USE_IIR_BLUR_REVERSE_PATH__                 0
+#endif
+
+// <q>Support Scaling for A1, A2 and A4 fonts
+// <i> Note that enabling this feature will reduces performance when using A1, A2 and A4 fonts when using scaling.
+#ifndef __ARM_2D_CFG_SUPPORT_TRANSFORM_FOR_NON_A8_FONTS__
+#   define __ARM_2D_CFG_SUPPORT_TRANSFORM_FOR_NON_A8_FONTS__        1
 #endif
 // </h>
 
@@ -96,8 +122,17 @@ extern "C" {
             |   ARM_2D_LOG_CHN_SCENE_PLAYER                                     \
             |   ARM_2D_LOG_CHN_DIRTY_REGION_OPTIMISATION                        \
             |   ARM_2D_LOG_CHN_STATISTICS                                       \
+            |   ARM_2D_LOG_CHN_CONTROLS                                         \
+            |   ARM_2D_LOG_CHN_GUI_STACK                                        \
             |   ARM_2D_LOG_CHN_APP)
 #endif
+
+// <q>Enable The Layout Debug Mode
+// <i> Arm-2D will mark the layout areas.
+#ifndef __ARM_2D_HELPER_CFG_LAYOUT_DEBUG_MODE__
+#   define __ARM_2D_HELPER_CFG_LAYOUT_DEBUG_MODE__                  0
+#endif
+
 // </h>
 
 // <h>Patches for improving performance

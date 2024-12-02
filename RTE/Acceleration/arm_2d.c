@@ -19,10 +19,10 @@
 /* ----------------------------------------------------------------------
  * Project:      Arm-2D Library
  * Title:        arm-2d.c
- * Description:  Tables for pixel pipeline OPs
+ * Description:  Essential components of Arm-2D
  *
- * $Date:        19. Nov 2023
- * $Revision:    V.1.3.1
+ * $Date:        4. April 2024
+ * $Revision:    V.1.3.2
  *
  * Target Processor:  Cortex-M cores
  *
@@ -210,6 +210,7 @@ typedef union arm_2d_log_chn_t {
 } arm_2d_log_chn_t;
 
 
+#if __ARM_2D_CFG_ENABLE_LOG__
 __WEAK
 void __arm_2d_log_printf(int32_t nIndentLevel, 
                          uint32_t wChannelMask,
@@ -220,7 +221,7 @@ void __arm_2d_log_printf(int32_t nIndentLevel,
 //    arm_2d_log_chn_t tChannelInfo = {
 //        .wValue = wChannelMask,
 //    };
-
+    static uint32_t s_wLineNumber = 0;
     if ((__ARM_2D_LOG_CHANNEL_MASK_FILTER__ & wChannelMask) != wChannelMask) {
         return ;
     }
@@ -232,9 +233,11 @@ void __arm_2d_log_printf(int32_t nIndentLevel,
         if (!(wMask & wChannelMask)) {
             continue;
         }
+        
+        s_wLineNumber++;
 
         /* start a new line */
-        __ARM_2D_PORT_PRINTF__("\r\n");
+        __ARM_2D_PORT_PRINTF__("[%010" PRIu32 "]\t", s_wLineNumber);
 
         for (int32_t n = 0; n < nIndentLevel; n++) {
             __ARM_2D_PORT_PRINTF__("\t");
@@ -245,8 +248,6 @@ void __arm_2d_log_printf(int32_t nIndentLevel,
         } else if   (ARM_2D_LOG_CHN_TYPE_INFO       == wMask) {
         #if defined(__ARM_2D_CFG_LOG_OUTPUT_SUPPORT_COLOUR__) && __ARM_2D_CFG_LOG_OUTPUT_SUPPORT_COLOUR__
             __ARM_2D_PORT_PRINTF__(ARM_2D_TERMINAL_COLOUR_BRIGHT_BLACK "[INFO]" ARM_2D_TERMINAL_COLOUR_DEFAULT);
-        #else
-            __ARM_2D_PORT_PRINTF__("      ");
         #endif
         } else if   (ARM_2D_LOG_CHN_TYPE_WARNING    == wMask) {
             __ARM_2D_PORT_PRINTF__(ARM_2D_TERMINAL_COLOUR_YELLOW "[WARNING]" ARM_2D_TERMINAL_COLOUR_DEFAULT);
@@ -275,9 +276,25 @@ void __arm_2d_log_printf(int32_t nIndentLevel,
         } else {
             __ARM_2D_PORT_PRINTF__("[Insufficient memory for logging]%s", pchFormatString);
         }
+
+        __ARM_2D_PORT_PRINTF__("\r\n");
     }
 
 }
+#else
+__WEAK
+void __arm_2d_log_printf(int32_t nIndentLevel, 
+                         uint32_t wChannelMask,
+                         const char *pchPrefix,
+                         const char *pchFormatString,
+                         ...)
+{
+    ARM_2D_UNUSED(nIndentLevel);
+    ARM_2D_UNUSED(wChannelMask);
+    ARM_2D_UNUSED(pchPrefix);
+    ARM_2D_UNUSED(pchFormatString);
+}
+#endif
 
 
 __WEAK
