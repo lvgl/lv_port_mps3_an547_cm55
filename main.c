@@ -34,7 +34,7 @@
 #   include "arm_2d_disp_adapters.h"
 #   include "arm_2d_scenes.h"
 #   include "arm_2d_scene_alarm_clock.h"
-#   include "arm_2d_scene_atom.h"
+#   include "arm_2d_demos.h"
 #endif
 
 
