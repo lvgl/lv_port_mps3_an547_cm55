@@ -64,7 +64,7 @@ void lv_port_disp_init(void)
     /* Example 1
      * One buffer for partial rendering*/
 #if LV_COLOR_DEPTH == 32
-    static lv_color_t buf_1[GLCD_WIDTH * GLCD_HEIGHT >> 3];
+    static lv_color_t buf_1[GLCD_WIDTH * GLCD_HEIGHT / 10];
 #else
     static lv_color_t buf_1[GLCD_WIDTH * (GLCD_HEIGHT / 4) ];
 #endif
