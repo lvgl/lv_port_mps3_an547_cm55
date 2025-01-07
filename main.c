@@ -65,7 +65,7 @@ void Disp0_DrawBitmap(  int16_t x,
                                         int16_t iTargetStride,
                                         arm_2d_size_t *__RESTRICT ptCopySize);
 
-    static uint16_t s_hwFrameBuffer[BENCHMARK_PFB_BLOCK_WIDTH * BENCHMARK_PFB_BLOCK_HEIGHT];
+    static uint16_t s_hwFrameBuffer[__GLCD_CFG_SCEEN_WIDTH__ * __GLCD_CFG_SCEEN_HEIGHT__];
     
     arm_2d_size_t size = {
         .iWidth = width,
@@ -108,12 +108,13 @@ int main(void)
     
     disp_adapter0_init();
     
+    arm_2d_scene_transform_init(&DISP0_ADAPTER);
 //arm_2d_scene_atom_init(&DISP0_ADAPTER);
-    arm_2d_scene0_init(&DISP0_ADAPTER);
+//    arm_2d_scene0_init(&DISP0_ADAPTER);
 //    arm_2d_scene_player_set_switching_mode(&DISP0_ADAPTER,
 //                                           ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE);
 //    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
-//    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
+    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
 
     while(1) {
         disp_adapter0_task();

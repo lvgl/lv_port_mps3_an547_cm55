@@ -10,7 +10,7 @@
       <TargetName>Cortex-M55_FVP</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6220000::V6.22::ARMCLANG</pCCUsed>
+      <pCCUsed>6230000::V6.23::.\ArmCompilerforEmbedded6.24</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -133,7 +133,7 @@
             <UseExternalTool>1</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>0</UpdateFlashBeforeDebugging>
-            <Capability>0</Capability>
+            <Capability>1</Capability>
             <DriverSelection>4102</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
@@ -314,7 +314,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>8</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -333,7 +333,7 @@
             <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
-            <v6Lto>0</v6Lto>
+            <v6Lto>1</v6Lto>
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
@@ -492,62 +492,62 @@
       </api>
     </apis>
     <components>
-      <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Atom" Cvendor="ARM" Cversion="1.0.2" condition="Arm-2D-EXTRA">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Transform" Cvendor="ARM" Cversion="1.0.2" condition="Arm-2D-Demos">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Controls" Cvendor="ARM" Cversion="1.7.7" condition="Arm-2D-EXTRA">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="Controls" Cvendor="ARM" Cversion="2.3.0" condition="Arm-2D-Controls">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf" Cvendor="ARM" Cversion="2.3.1" condition="Arm-2D-CORE">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D Extras" Csub="LCD ASCII Printf" Cvendor="ARM" Cversion="2.8.0" condition="Arm-2D-Printf">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cvendor="ARM" Cversion="2.4.0" condition="Arm-2D-Helper" maxInstances="8">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Display Adapter" Cvendor="ARM" Cversion="3.2.7" condition="Arm-2D-Displayer-Adapter" maxInstances="8">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="PFB" Cvendor="ARM" Cversion="1.12.1" condition="Arm-2D-CORE">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="PFB" Cvendor="ARM" Cversion="2.5.3" condition="Arm-2D-CORE">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Scene" Cvendor="ARM" Cversion="1.2.9" condition="Arm-2D-Helper" maxInstances="1000">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D Helper" Csub="Scene" Cvendor="ARM" Cversion="1.3.3" condition="Arm-2D-Scene" maxInstances="1000">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Alpha-Blending" Cvendor="ARM" Cversion="1.1.7" condition="Arm-2D-CORE">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Alpha-Blending" Cvendor="ARM" Cversion="1.2.2-dev" condition="Arm-2D-CORE">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.1.7" condition="CMSIS-DSP">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Core" Cvendor="ARM" Cversion="1.2.2-dev" condition="CMSIS-DSP">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Filter" Cvendor="ARM" Cversion="1.1.7" condition="Arm-2D-CORE">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Filter" Cvendor="ARM" Cversion="1.2.2-dev" condition="Arm-2D-CORE">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Transform" Cvendor="ARM" Cversion="1.1.7" condition="Arm-2D-CORE">
-        <package name="Arm-2D" schemaVersion="1.7.28" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+      <component Cclass="Acceleration" Cgroup="Arm-2D" Csub="Transform" Cvendor="ARM" Cversion="1.2.2-dev" condition="Arm-2D-CORE">
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
@@ -582,10 +582,14 @@
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="CMSIS" Cgroup="DSP" Cvariant="Source" Cvendor="ARM" Cversion="1.15.0" condition="CMSISCORE">
-        <package name="CMSIS-DSP" schemaVersion="1.7.7" url="https://www.keil.com/pack/" vendor="ARM" version="1.15.0"/>
+      <component Cclass="CMSIS" Cgroup="DSP" Cvariant="Source" Cvendor="ARM" Cversion="1.16.2" condition="CMSISCORE">
+        <package name="CMSIS-DSP" schemaVersion="1.7.27" url="https://www.keil.com/pack/" vendor="ARM" version="1.16.2"/>
         <targetInfos>
-          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_FVP">
+            <c>
+              <MiscControls>-w</MiscControls>
+            </c>
+          </targetInfo>
         </targetInfos>
       </component>
       <component Cclass="Device" Cgroup="Definition" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device">
@@ -624,8 +628,8 @@
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </component>
-      <component Cclass="Utilities" Cgroup="perf_counter" Csub="Core" Cvariant="Source" Cvendor="GorgonMeducer" Cversion="2.3.1" condition="CMSIS-CORE">
-        <package name="perf_counter" schemaVersion="1.7.28" url="https://raw.githubusercontent.com/GorgonMeducer/perf_counter/CMSIS-Pack/cmsis-pack/" vendor="GorgonMeducer" version="2.3.1"/>
+      <component Cclass="Utilities" Cgroup="perf_counter" Csub="Core" Cvariant="Source" Cvendor="GorgonMeducer" Cversion="2.4.0" condition="CMSIS-CORE">
+        <package name="perf_counter" schemaVersion="1.7.37" url="https://raw.githubusercontent.com/GorgonMeducer/perf_counter/CMSIS-Pack/cmsis-pack/" vendor="GorgonMeducer" version="2.4.0"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
@@ -711,16 +715,28 @@
         </targetInfos>
       </file>
       <file attr="config" category="sourceC" name="examples\demos\arm_2d_scene_atom.c" version="1.1.1">
-        <instance index="0">RTE\Acceleration\arm_2d_scene_atom.c</instance>
+        <instance index="0" removed="1">RTE\Acceleration\arm_2d_scene_atom.c</instance>
         <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Atom" Cvendor="ARM" Cversion="1.1.1" condition="Arm-2D-Demos"/>
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="header" name="examples\demos\arm_2d_scene_atom.h" version="1.1.1">
+        <instance index="0" removed="1">RTE\Acceleration\arm_2d_scene_atom.h</instance>
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Atom" Cvendor="ARM" Cversion="1.1.1" condition="Arm-2D-Demos"/>
+        <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
+        <targetInfos/>
+      </file>
+      <file attr="config" category="sourceC" name="examples\demos\arm_2d_scene_transform.c" version="1.0.2">
+        <instance index="0">RTE\Acceleration\arm_2d_scene_transform.c</instance>
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Transform" Cvendor="ARM" Cversion="1.0.2" condition="Arm-2D-Demos"/>
         <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
       </file>
-      <file attr="config" category="header" name="examples\demos\arm_2d_scene_atom.h" version="1.1.1">
-        <instance index="0">RTE\Acceleration\arm_2d_scene_atom.h</instance>
-        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Atom" Cvendor="ARM" Cversion="1.1.1" condition="Arm-2D-Demos"/>
+      <file attr="config" category="header" name="examples\demos\arm_2d_scene_transform.h" version="1.0.2">
+        <instance index="0">RTE\Acceleration\arm_2d_scene_transform.h</instance>
+        <component Cclass="Acceleration" Cgroup="Arm-2D Demos" Csub="Transform" Cvendor="ARM" Cversion="1.0.2" condition="Arm-2D-Demos"/>
         <package name="Arm-2D" schemaVersion="1.7.37" url="https://www.keil.com/pack/" vendor="ARM" version="9.9.99"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
@@ -744,8 +760,8 @@
       </file>
       <file attr="config" category="header" name="EventRecorder\Config\EventRecorderConf.h" version="1.1.0">
         <instance index="0">RTE\CMSIS-View\EventRecorderConf.h</instance>
-        <component Cclass="CMSIS-View" Cgroup="Event Recorder" Cvariant="DAP" Cvendor="ARM" Cversion="1.5.3" condition="EventRecorder"/>
-        <package name="CMSIS-View" schemaVersion="1.7.25" url="https://www.keil.com/pack/" vendor="ARM" version="1.1.0"/>
+        <component Cclass="CMSIS-View" Cgroup="Event Recorder" Cvariant="DAP" Cvendor="ARM" Cversion="1.6.0" condition="EventRecorder"/>
+        <package name="CMSIS-View" schemaVersion="1.7.36" url="https://www.keil.com/pack/" vendor="ARM" version="1.2.0"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
         </targetInfos>
