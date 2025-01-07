@@ -50,7 +50,7 @@ extern "C" {
                          __blend_area,                                          \
                          __draw_unit,                                           \
                          __draw_dsc)                                            \
-        lv_draw_sw_image_helium(   (__transformed),                             \
+        lv_draw_sw_image_helium(   (__transformed),                            \
                                     (__cf),                                     \
                                     (uint8_t *)(__src_buf),                     \
                                     (__img_coords),                             \
@@ -62,7 +62,7 @@ extern "C" {
 
 #ifndef LV_DRAW_SW_RGB565_RECOLOR
     #define LV_DRAW_SW_RGB565_RECOLOR(__src_buf, __blend_area, __color, __opa)  \
-        lv_draw_sw_image_recolor_rgb565(   (__src_buf),                         \
+        lv_draw_sw_image_recolor_rgb565(   (__src_buf),                        \
                                             &(__blend_area),                    \
                                             (__color),                          \
                                             (__opa))
@@ -74,7 +74,7 @@ extern "C" {
                                         __color,                                \
                                         __opa,                                  \
                                         __cf)                                   \
-        lv_draw_sw_image_recolor_rgb888(   (__src_buf),                         \
+        lv_draw_sw_image_recolor_rgb888(   (__src_buf),                        \
                                             &(__blend_area),                    \
                                             (__color),                          \
                                             (__opa),                            \
@@ -201,7 +201,7 @@ static lv_result_t lv_draw_sw_image_helium(
            ||  (LV_COLOR_FORMAT_RGB565A8 == src_cf))) {
             break;
         }
-    #if 1 /* a temporary patch */
+    #if ARM_2D_VERSION > 10201ul
         if((LV_COLOR_FORMAT_XRGB8888 == des_cf)
         && !(  (LV_COLOR_FORMAT_ARGB8888 == src_cf)
            ||  (LV_COLOR_FORMAT_XRGB8888 == src_cf))) {
@@ -446,7 +446,7 @@ static lv_result_t lv_draw_sw_image_helium(
             }
 
         }
-    #if 1  /* a temporary patch */
+    #if ARM_2D_VERSION > 10201ul
         else if(LV_COLOR_FORMAT_ARGB8888 == src_cf) {
             LV_ASSERT(LV_COLOR_FORMAT_XRGB8888 == des_cf);
 
