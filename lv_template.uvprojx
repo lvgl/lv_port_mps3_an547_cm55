@@ -1337,8 +1337,16 @@
       <component Cclass="CMSIS" Cgroup="DSP" Cvariant="Source" Cvendor="ARM" Cversion="1.16.2" condition="CMSISCORE">
         <package name="CMSIS-DSP" schemaVersion="1.7.27" url="https://www.keil.com/pack/" vendor="ARM" version="1.16.2"/>
         <targetInfos>
-          <targetInfo name="Cortex-M55_FVP"/>
-          <targetInfo name="Cortex-M55_MPS3"/>
+          <targetInfo name="Cortex-M55_FVP">
+            <c>
+              <MiscControls>-w</MiscControls>
+            </c>
+          </targetInfo>
+          <targetInfo name="Cortex-M55_MPS3">
+            <c>
+              <MiscControls>-w</MiscControls>
+            </c>
+          </targetInfo>
         </targetInfos>
       </component>
       <component Cclass="Device" Cgroup="Definition" Cvendor="ARM" Cversion="2.0.0" condition="SSE-300-MPS3 Device">
@@ -1398,6 +1406,13 @@
         </targetInfos>
       </component>
       <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Demos" Csub="Assets" Cvendor="LVGL" Cversion="9.3.0-dev2" condition="LVGL-Essential">
+        <package name="lvgl" schemaVersion="1.7.37" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.3.0-dev2"/>
+        <targetInfos>
+          <targetInfo name="Cortex-M55_FVP"/>
+          <targetInfo name="Cortex-M55_MPS3"/>
+        </targetInfos>
+      </component>
+      <component Cbundle="LVGL9" Cclass="LVGL" Cgroup="Demos" Csub="Benchmark" Cvendor="LVGL" Cversion="9.3.0-dev2" condition="Demo-Benchmark">
         <package name="lvgl" schemaVersion="1.7.37" url="https://raw.githubusercontent.com/lvgl/lvgl/master/env_support/cmsis-pack/" vendor="LVGL" version="9.3.0-dev2"/>
         <targetInfos>
           <targetInfo name="Cortex-M55_FVP"/>
