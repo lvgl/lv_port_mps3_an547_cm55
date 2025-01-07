@@ -37,6 +37,10 @@
 #   include "arm_2d_demos.h"
 #endif
 
+#if defined(RTE_Acceleration_Arm_2D_Extra_Benchmark)
+#   include "arm_2d_benchmark.h"
+#endif
+
 
 
 
@@ -107,14 +111,18 @@ int main(void)
     arm_2d_init();
     
     disp_adapter0_init();
-    
-    arm_2d_scene_transform_init(&DISP0_ADAPTER);
+
+#if defined(RTE_Acceleration_Arm_2D_Extra_Benchmark)
+    arm_2d_run_benchmark();
+#else
+//    arm_2d_scene_transform_init(&DISP0_ADAPTER);
 //arm_2d_scene_atom_init(&DISP0_ADAPTER);
 //    arm_2d_scene0_init(&DISP0_ADAPTER);
 //    arm_2d_scene_player_set_switching_mode(&DISP0_ADAPTER,
 //                                           ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE);
 //    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
-    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
+//    arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
+#endif
 
     while(1) {
         disp_adapter0_task();
