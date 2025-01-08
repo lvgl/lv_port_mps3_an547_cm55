@@ -331,7 +331,7 @@ void __draw_transform_object_handler( void *pObj,
     float fScale = ((float)iDistance / (float)dynamic_nebula_get_radius(ptDN)) * 2.0f;
 
     switch(ptTransObj->emType) {
-#if 0
+
         case TRANSFROM_TYPE_FILL_COLOUR_WITH_MASK_AND_OPACITY: {
 
                 arm_2d_location_t tCentre = {
@@ -360,7 +360,7 @@ void __draw_transform_object_handler( void *pObj,
 
             }
             break;
-#endif
+
 
         case TRANSFORM_TYPE_TILE_WITH_MASK_AND_OPACITY: {
 
@@ -377,7 +377,7 @@ void __draw_transform_object_handler( void *pObj,
                         NULL,                                                       //!< target region
                         tCentre,                                                    //!< pivot on source
                         ptTransObj->tHelper.fAngle,                                 //!< rotation angle 
-                        1.0f,//fScale,                                                     //!< scale
+                        fScale,                                                     //!< scale
                         chOpacity,                                                  //!< opacity
                         &tLocation
                 );
@@ -391,7 +391,6 @@ void __draw_transform_object_handler( void *pObj,
             }
             break;
 
-#if 0
         case TRANSFORM_TYPE_TILE_WITH_COLOUR_KEYING_AND_OPACITY: {
             arm_2d_location_t tCentre = {
                     .iX = c_tileEarth.tRegion.tSize.iWidth >> 1,
@@ -444,7 +443,7 @@ void __draw_transform_object_handler( void *pObj,
                 ARM_2D_OP_WAIT_ASYNC(&ptTransObj->tOP);
             }
             break;
-#endif
+
         default:
             break;
     }
@@ -526,7 +525,7 @@ user_scene_transform_t *__arm_2d_scene_transform_init(   arm_2d_scene_player_t *
     do {
         int16_t iRadius = MIN(tScreen.tSize.iHeight, tScreen.tSize.iWidth) / 2;
         dynamic_nebula_cfg_t tCFG = {
-            .fSpeed = 0.1f,
+            .fSpeed = 0.6f,
             .iRadius = iRadius,
             .iVisibleRingWidth = iRadius,
             .hwParticleCount = dimof(this.tObjects),
